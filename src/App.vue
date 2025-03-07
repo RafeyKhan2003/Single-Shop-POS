@@ -3,9 +3,13 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'App'
-});
+  name: 'App',
+  async created() {
+    console.log('created')
+    console.log(await window.shopApi.createProduct())
+  },
+})
 </script>

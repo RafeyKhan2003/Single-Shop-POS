@@ -1,3 +1,12 @@
+// import path from 'node:path'
+// import fs from 'node:fs'
+// import { fileURLToPath } from 'node:url'
+import { contextBridge } from 'electron'
+import dbLocal from 'db-local'
+// const dbLocal = require('db-local')
+
+// const currentDir = fileURLToPath(new URL('.', import.meta.url))
+
 /**
  * This file is used specifically for security reasons.
  * Here you can access Nodejs stuff and inject functionality into
@@ -27,3 +36,44 @@
  *   }
  * }
  */
+
+const date = new Date()
+
+let day = date.getDate()
+let month = date.getMonth() + 1
+let year = date.getFullYear()
+
+const suffix = `-temp-${day}-${month}-${year}`
+
+contextBridge.exposeInMainWorld('shopApi', {
+  createProduct: async () => {
+    const { Schema } = new dbLocal({ path: './databases' })
+    console.log(suffix)
+    console.log(Schema)
+
+    const User = Schema(`User${suffix}`, {
+      name: { type: String, default: 'Customer' },
+      username: { type: String },
+      tag: { type: String },
+    })
+
+    const user = User.create({
+      // _id: 1,
+      username: 'Lennart',
+      tag: 'Lennart#123',
+      bag: { weapons: ['bow', 'katana'] },
+    }).save()
+
+    user.save()
+    console.log(user)
+
+    console.log('wokirg')
+  },
+  updateProduct: () => {},
+  removeProduct: () => {},
+  findProduct: () => {},
+  // createProduct: () => {},
+  // createProduct: () => {},
+  // createProduct: () => {},
+  // createProduct: () => {},
+})
