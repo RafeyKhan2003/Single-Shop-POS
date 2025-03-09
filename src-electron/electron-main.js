@@ -12,13 +12,10 @@ const currentDir = fileURLToPath(new URL('.', import.meta.url))
 let mainWindow
 
 async function createWindow() {
-  const date = new Date()
+  let date = new Date()
+  date = date.toISOString().split('T')[0]
 
-  let day = date.getDate()
-  let month = date.getMonth() + 1
-  let year = date.getFullYear()
-
-  const suffix = `-temp-${day}-${month}-${year}`
+  const suffix = `-temp-${date}`
   /**
    * Check and delete previous files.
    */

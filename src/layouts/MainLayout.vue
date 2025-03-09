@@ -1,116 +1,73 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+  <div class="bg-dark text-white">
+    <q-toolbar>
+      <q-btn
+        flat
+        dense
+        round
+        icon="las la-bars"
+        aria-label="Menu"
+        clickable
+        :to="{ name: 'menu' }"
+        tabindex="-1"
+      />
 
-        <q-toolbar-title>
-          Quasar App
-        </q-toolbar-title>
+      <q-toolbar-title> Point of Sale </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
-      </q-toolbar>
-    </q-header>
+      <div></div>
+    </q-toolbar>
+  </div>
 
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-    >
-      <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
-
-        <EssentialLink
-          v-for="link in linksList"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
-    </q-drawer>
-
-    <q-page-container>
+  <div class="q-px-md" style="overflow: hidden">
+    <div class="q-py-md">
       <router-view />
-    </q-page-container>
-  </q-layout>
+    </div>
+  </div>
+
+  <UpdateShopData v-if="shopDataModal" />
+  <OpenTillData
+    v-if="tillDataModal"
+    @tillOpened="
+      (r) => {
+        if (r) this.tillDataModal = false
+      }
+    "
+  />
 </template>
 
 <script>
 import { defineComponent, ref } from 'vue'
-import EssentialLink from 'components/EssentialLink.vue'
-
-const linksList = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
-  }
-]
+import UpdateShopData from 'components/UpdateShopData.vue'
+import OpenTillData from 'components/OpenTillData.vue'
 
 export default defineComponent({
   name: 'MainLayout',
 
   components: {
-    EssentialLink
+    UpdateShopData,
+    OpenTillData,
   },
-
-  setup () {
-    const leftDrawerOpen = ref(false)
-
+  data() {
     return {
-      linksList,
-      leftDrawerOpen,
-      toggleLeftDrawer () {
-        leftDrawerOpen.value = !leftDrawerOpen.value
-      }
+      shopDataModal: ref(false),
+      tillDataModal: ref(false),
     }
-  }
+  },
+  async mounted() {
+    if (!this.$shop.name) {
+      console.log('Shop not initialized...')
+      this.shopDataModal = true
+      return
+    }
+    this.CheckOpenTill()
+  },
+  methods: {
+    CheckOpenTill() {
+      if (!this.$till.opening_time) {
+        console.log('Till not Opened...')
+        this.tillDataModal = true
+      }
+    },
+  },
 })
 </script>

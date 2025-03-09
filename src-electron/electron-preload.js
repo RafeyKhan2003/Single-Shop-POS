@@ -37,27 +37,154 @@ import dbLocal from 'db-local'
  * }
  */
 
-const date = new Date()
+let date = new Date()
+date = date.toISOString().split('T')[0]
 
-let day = date.getDate()
-let month = date.getMonth() + 1
-let year = date.getFullYear()
+const suffix = `-temp-${date}`
 
-const suffix = `-temp-${day}-${month}-${year}`
+const { Schema } = new dbLocal({ path: './databases' })
 
-contextBridge.exposeInMainWorld('shopApi', {
+const Shop = Schema(`Shop`, {
+  name: { type: String },
+  address: { type: String },
+  phone: { type: String },
+  email: { type: String },
+})
+
+const GenProduct = Schema(`GenProducts`, {
+  name: { type: String },
+  type: { type: String, default: 'Parts' },
+  condition: { type: String, default: 'New' },
+})
+
+const existingGenProducts = GenProduct.find()
+if (!existingGenProducts.length) {
+  ;[
+    { name: 'Bike', type: 'Bike', condition: 'New' },
+    { name: 'Bike', type: 'Bike', condition: 'Used' },
+    { name: 'Helmet', type: 'Helmet', condition: 'New' },
+    { name: 'Helmet', type: 'Helmet', condition: 'Used' },
+    { name: 'Part', type: 'Parts', condition: 'New' },
+    { name: 'Part', type: 'Parts', condition: 'Used' },
+  ].forEach((p) => GenProduct.create(p).save())
+}
+
+const Product = Schema(`Products`, {
+  name: { type: String },
+  username: { type: String },
+  tag: { type: String },
+})
+
+// const Sale = Schema(`Sales${suffix}`, {
+//   name: { type: String },
+//   username: { type: String },
+//   tag: { type: String },
+// })
+
+const Till = Schema(`Till${suffix}`, {
+  till_date: { type: String },
+  opening_time: { type: Date },
+  closing_time: { type: Date },
+  opening_amount: { type: Number },
+  closing_amount: { type: Number },
+})
+
+contextBridge.exposeInMainWorld('posApi', {
+  /**
+   * Shop Related
+   */
+
+  updateShop: (shop) => {
+    console.log(shop)
+    let s = Shop.findOne() || {}
+    if (s.name) {
+      s.update({
+        name: shop.name,
+        address: shop.address,
+        phone: shop.phone,
+        email: shop.email,
+      }).save()
+      return true
+    }
+    let sh = Shop.create({
+      name: shop.name,
+      address: shop.address,
+      phone: shop.phone,
+      email: shop.email,
+    }).save()
+
+    if (sh) {
+      return true
+    }
+  },
+  getShop: () => {
+    return Shop.findOne() || {}
+  },
+
+  /**
+   * Till Related
+   */
+
+  openTill: (till) => {
+    const t = Till.create({
+      till_date: date,
+      opening_time: new Date().toDateString(),
+      closing_time: '',
+      opening_amount: till.opening_amount,
+      closing_amount: 0,
+    }).save()
+    if (t) return true
+  },
+  getTill: () => {
+    let till = Till.findOne() || {}
+    if (till.till_date !== date) {
+      return {}
+    }
+    return till
+  },
+  updateTill: (till) => {
+    let t = Till.findOne() || {}
+    t.update({
+      closing_time: till.closing_time || '',
+      closing_amount: till.closing_amount || 0,
+    }).save()
+    return true
+  },
+
+  /**
+   * General Products Related
+   */
+  createGenProduct: async (product) => {
+    const pr = GenProduct.create({
+      name: product.name,
+      type: product.type,
+      condition: product.condition,
+    }).save()
+    if (pr) return true
+  },
+  updateGenProduct: (pr) => {
+    const product = GenProduct.findOne({ _id: pr._id })
+    if (!product) return false
+    product
+      .update({
+        name: pr.name,
+        type: pr.type,
+        condition: pr.condition,
+      })
+      .save()
+
+    return true
+  },
+  getGenProducts: () => {
+    return GenProduct.find()
+  },
+  removeGenProduct: (pr) => {
+    return GenProduct.remove({ _id: pr._id })
+  },
+  findGenProduct: () => {},
+
   createProduct: async () => {
-    const { Schema } = new dbLocal({ path: './databases' })
-    console.log(suffix)
-    console.log(Schema)
-
-    const User = Schema(`User${suffix}`, {
-      name: { type: String, default: 'Customer' },
-      username: { type: String },
-      tag: { type: String },
-    })
-
-    const user = User.create({
+    const user = Product.create({
       // _id: 1,
       username: 'Lennart',
       tag: 'Lennart#123',
