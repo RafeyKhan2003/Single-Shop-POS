@@ -176,6 +176,20 @@ export default {
     },
     // Close the product edit dialog without saving
     closeEditDialog() {
+      if (isNaN(this.editProductData.price) || this.editProductData.price === undefined) {
+        this.$q.notify({
+          message: 'Price is not a number',
+          color: 'negative',
+        })
+        return
+      }
+      if (isNaN(parseInt(this.editProductData.qty)) || this.editProductData.qty === undefined) {
+        this.$q.notify({
+          message: 'Quantity is not a number',
+          color: 'negative',
+        })
+        return
+      }
       this.editDialog = false
       this.$nextTick(() => {
         this.$refs.searchInput.focus()
