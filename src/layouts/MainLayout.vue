@@ -2,6 +2,7 @@
   <div class="bg-dark text-white">
     <q-toolbar>
       <q-btn
+        square
         flat
         dense
         round
@@ -52,6 +53,7 @@ export default defineComponent({
     return {
       shopDataModal: ref(false),
       tillDataModal: ref(false),
+      till: window.posApi.getTill(),
     }
   },
   async mounted() {
@@ -64,7 +66,7 @@ export default defineComponent({
   },
   methods: {
     CheckOpenTill() {
-      if (!this.$till.opening_time) {
+      if (!this.till.opening_time) {
         console.log('Till not Opened...')
         this.tillDataModal = true
       }

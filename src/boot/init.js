@@ -12,6 +12,18 @@ function Print(html, callback, page_size = 'height=600,width=800') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Print</title>
+    <style>
+     body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            width: 80mm;
+            /* Standard POS slip width */
+            margin: 0 auto;
+            padding: 10px;
+            border: 1px solid #000;
+        }
+
+    </style>
   </head>
   <body>
   `)
@@ -38,7 +50,6 @@ export default boot(({ app }) => {
   app.config.globalProperties.$PosSlip = PosSlip
 
   app.config.globalProperties.$shop = shop
-  app.config.globalProperties.$till = window.posApi.getTill()
 
   app.config.globalProperties.$product_types = ['Bike', 'Helmet', 'Parts', 'Accessories']
   app.config.globalProperties.$payment_methods = [

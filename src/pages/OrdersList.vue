@@ -2,6 +2,11 @@
   <q-card square class="full-width">
     <q-card-section>
       <div class="text-center q-ml-sm text-h5">All Orders</div>
+      <div>
+        <span v-for="p in payments" :key="p"
+          >{{ p.payment_method }}: {{ $currency }}{{ p.total_amount }},
+        </span>
+      </div>
     </q-card-section>
 
     <q-card-section class="no-padding">
@@ -47,12 +52,14 @@ export default defineComponent({
   data() {
     return {
       orders: [],
+      payments: [],
       modal: false,
       currentOrder: {},
     }
   },
   created() {
     this.orders = window.posApi.getAllOrders()
+    this.payments = window.posApi.getSalesTotalPayment()
   },
   methods: {
     ViewSlip(order) {

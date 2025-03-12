@@ -22,7 +22,7 @@
     >
       <!-- Cart Summary -->
       <q-card square class="q-mt-md" style="flex-grow: 1" bordered>
-        <q-card-section style="height: 350px; overflow-y: auto">
+        <q-card-section style="height: 300px; overflow-y: auto">
           <div class="text-h6">Cart</div>
 
           <!-- Table Header -->
@@ -70,6 +70,7 @@
           style="width: 50%"
         >
           <q-btn
+            square
             color="primary"
             style="width: 100%"
             @click="addProductToCart(product)"
@@ -83,20 +84,47 @@
         </div>
       </div>
     </div>
-    <div class="col-12 q-pt-md">
+    <div class="col-6 q-pl-sm q-pt-md">
       <div class="q-gutter-md">
-        <q-btn color="primary" @click="OpenPayments" tabindex="-1" :disable="!this.cart.length">
-          Complete Order
-        </q-btn>
-        <q-btn color="primary" @click="() => (this.ordersModal = true)" tabindex="-1">
+        <q-btn square color="primary" @click="() => (this.ordersModal = true)" tabindex="-1">
           Orders List
+        </q-btn>
+      </div>
+    </div>
+    <div class="col-6 q-pl-sm q-pt-md">
+      <div class="q-pa-lg text-center bg-blue-8">
+        <div class="text-h3 q-mb-sm">{{ this.$currency }}{{ totalAmount }}</div>
+        <div>
+          Opening: {{ this.$currency }}{{ till.opening_amount }} - Current Till: {{ this.$currency
+          }}{{ currentTill }}
+        </div>
+      </div>
+      <div>
+        <q-btn
+          square
+          class="full-width"
+          color="green-8"
+          @click="OpenPayments"
+          tabindex="-1"
+          :disable="!this.cart.length"
+        >
+          Complete Order
         </q-btn>
       </div>
     </div>
   </div>
 
   <!-- Orders List Modal -->
-  <q-dialog v-model="ordersModal">
+  <q-dialog
+    v-model="ordersModal"
+    @hide="
+      () => {
+        this.$nextTick(() => {
+          this.$refs.searchInput.focus()
+        })
+      }
+    "
+  >
     <OrdersList />
   </q-dialog>
 
@@ -123,8 +151,8 @@
         <q-input v-model="editProductData.qty" label="Quantity" type="number" />
       </q-card-section>
       <q-card-actions>
-        <q-btn label="Cancel" color="negative" icon="las la-ban" @click="closeEditDialog" />
-        <q-btn label="Save" color="positive" icon="las la-save" @click="saveProductEdit" />
+        <q-btn square label="Cancel" color="negative" icon="las la-ban" @click="closeEditDialog" />
+        <q-btn square label="Save" color="positive" icon="las la-save" @click="saveProductEdit" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -155,6 +183,8 @@ export default {
     return {
       searchQuery: '',
       generalProducts: window.posApi.getGenProducts(),
+      currentTill: window.posApi.getTillTotal(),
+      till: window.posApi.getTill(),
       cart: [],
       editProductModal: false,
       editProductData: {

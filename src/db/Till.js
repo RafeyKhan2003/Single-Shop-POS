@@ -1,4 +1,5 @@
 import { Schema, suffix, date } from './db'
+import Order from './Order'
 
 class TillDB {
   constructor() {
@@ -35,6 +36,15 @@ class TillDB {
       closing_amount: till.closing_amount || 0,
     }).save()
     return true
+  }
+  getTillTotal() {
+    const till = this.Till.findOne()
+    const cashSalesTotal = Order.getSalesTotal('Cash')
+
+    //TODO: Subtract Cash purchase total
+    const cashPurchaseTotal = 0
+
+    return till.opening_amount + cashSalesTotal - cashPurchaseTotal
   }
 }
 

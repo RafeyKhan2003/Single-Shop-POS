@@ -53,6 +53,7 @@ contextBridge.exposeInMainWorld('posApi', {
   openTill: (till) => Till.openTill(till),
   getTill: () => Till.getTill(),
   updateTill: (till) => Till.updateTill(till),
+  getTillTotal: () => Till.getTillTotal(), //check
 
   /**
    * General Products Related
@@ -81,4 +82,6 @@ contextBridge.exposeInMainWorld('posApi', {
   getOrder: (order_id) => Order.getOrder(order_id),
   getAllOrders: () => Order.getAllOrders(),
   removeOrder: (order) => Order.removeOrder(order),
+  getSalesTotal: (payment_type) => Order.getSalesTotal(payment_type),
+  getSalesTotalPayment: () => Order.getSalesTotalPayment(),
 })

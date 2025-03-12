@@ -63,6 +63,50 @@ class OrderDB {
     }
     return id
   }
+  getSalesTotal(payment_type = null) {
+    const orders = this.Order.find()
+
+    const total = orders.reduce((sum, order) => {
+      const payments = payment_type
+        ? order.payments.filter((p) => p.payment_method === payment_type)
+        : order.payments
+      const orderTotal = payments.reduce(
+        (orderSum, payment) => orderSum + payment.payment_amount,
+        0,
+      )
+      return sum + orderTotal
+    }, 0)
+
+    return total
+  }
+  getSalesTotalPayment() {
+    const orders = this.Order.find()
+
+    // Use a Map to accumulate totals for each payment method
+    const paymentTotals = new Map()
+
+    orders.forEach((order) => {
+      order.payments.forEach((payment) => {
+        const { payment_method, payment_amount } = payment
+
+        // If the payment method already exists in the Map, add to its total
+        if (paymentTotals.has(payment_method)) {
+          paymentTotals.set(payment_method, paymentTotals.get(payment_method) + payment_amount)
+        } else {
+          // Otherwise, initialize the payment method in the Map
+          paymentTotals.set(payment_method, payment_amount)
+        }
+      })
+    })
+
+    // Convert the Map to an array of objects
+    const result = Array.from(paymentTotals).map(([method, total]) => ({
+      payment_method: method,
+      total_amount: total,
+    }))
+
+    return result
+  }
 }
 
 export default new OrderDB()

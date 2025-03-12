@@ -11,6 +11,7 @@
         <q-card-section>
           <div class="q-gutter-y-md column">
             <q-btn
+              square
               label="Add Payment Method"
               color="primary"
               @click="addPaymentMethod"
@@ -67,8 +68,9 @@
         </q-card-section>
         <q-separator />
         <q-card-actions align="right">
-          <q-btn label="Cancel" color="negative" @click="cancelPayment" />
+          <q-btn square label="Cancel" color="negative" @click="cancelPayment" />
           <q-btn
+            square
             label="Save"
             icon="las la-save"
             color="green-8"

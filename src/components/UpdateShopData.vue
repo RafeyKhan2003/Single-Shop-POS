@@ -15,7 +15,7 @@
         </q-card-section>
         <q-separator />
         <q-card-actions align="right">
-          <q-btn label="Save" icon="las la-save" color="green-8" type="submit" />
+          <q-btn square label="Save" icon="las la-save" color="green-8" type="submit" />
         </q-card-actions>
       </q-form>
     </q-card>

@@ -1,7 +1,7 @@
 <template>
   <div class="row">
     <div class="q-pa-sm col-12 col-sm-4">
-      <q-btn stack color="secondary" class="full-width q-py-md" :to="{ name: 'pos-till' }">
+      <q-btn square stack color="secondary" class="full-width q-py-md" :to="{ name: 'pos-till' }">
         <q-icon size="5em" name="las la-shopping-cart" />
         <div>Point of Sale</div>
       </q-btn>
@@ -9,6 +9,7 @@
 
     <div class="q-pa-sm col-12 col-sm-4">
       <q-btn
+        square
         stack
         color="secondary"
         class="full-width q-py-md"
@@ -23,6 +24,7 @@
 
     <div class="q-pa-sm col-12 col-sm-4">
       <q-btn
+        square
         stack
         color="secondary"
         class="full-width q-py-md"
