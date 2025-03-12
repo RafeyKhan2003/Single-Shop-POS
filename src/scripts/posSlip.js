@@ -4,15 +4,7 @@ export function PosSlip(order) {
   let data = `
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 12px;
-            width: 80mm;
-            /* Standard POS slip width */
-            margin: 0 auto;
-            padding: 10px;
-            border: 1px solid #000;
-        }
+
 
         .header {
             text-align: center;
