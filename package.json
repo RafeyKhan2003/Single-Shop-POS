@@ -17,6 +17,7 @@
   "dependencies": {
     "@quasar/extras": "^1.16.4",
     "db-local": "^3.1.0",
+    "exceljs": "^4.4.0",
     "lowdb": "^7.0.1",
     "quasar": "^2.16.0",
     "vue": "^3.4.18",

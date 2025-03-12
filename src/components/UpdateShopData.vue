@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="modal" persistent>
-    <q-card class="full-width">
+    <q-card square class="full-width">
       <q-form @submit.prevent="UpdateShop">
         <q-card-section>
           <div class="text-center q-ml-sm text-h5 text-red-8">Update Shop Data</div>

@@ -24,7 +24,8 @@
     </div>
   </div>
 
-  <UpdateShopData v-if="shopDataModal" />
+  <UpdateShopData v-if="shopDataModal"></UpdateShopData>
+
   <OpenTillData
     v-if="tillDataModal"
     @tillOpened="

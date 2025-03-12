@@ -6,6 +6,21 @@
         <div>Point of Sale</div>
       </q-btn>
     </div>
+
+    <div class="q-pa-sm col-12 col-sm-4">
+      <q-btn
+        stack
+        color="secondary"
+        class="full-width q-py-md"
+        :to="{
+          name: 'orders-list',
+        }"
+      >
+        <q-icon size="5em" name="las la-warehouse" />
+        <div>Orders List</div>
+      </q-btn>
+    </div>
+
     <div class="q-pa-sm col-12 col-sm-4">
       <q-btn
         stack
@@ -17,7 +32,7 @@
           }
         "
       >
-        <q-icon size="5em" name="las la-warehouse" />
+        <q-icon size="5em" name="las la-cog" />
         <div>Update Shop Data</div>
       </q-btn>
     </div>

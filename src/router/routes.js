@@ -9,6 +9,11 @@ const routes = [
         name: 'menu',
         component: () => import('src/pages/Menu.vue'),
       },
+      {
+        path: 'orders-list',
+        name: 'orders-list',
+        component: () => import('src/pages/OrdersList.vue'),
+      },
     ],
   },
 

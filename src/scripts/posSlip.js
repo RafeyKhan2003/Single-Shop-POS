@@ -2,13 +2,7 @@ import { currency, shop } from '../boot/init'
 
 export function PosSlip(order) {
   let data = `
-  <!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POS Slip</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -76,9 +70,7 @@ export function PosSlip(order) {
             }
         }
     </style>
-</head>
 
-<body>
     <div class="header">
         <div class="shop-name">${shop.name}</div>
         <div class="address">${shop.address}</div>
@@ -134,9 +126,7 @@ export function PosSlip(order) {
         <p>This is a computer-generated slip. No signature is required.</p>
         <p>Thank you for shopping with us!</p>
     </div>
-</body>
 
-</html>
   `
 
   return data

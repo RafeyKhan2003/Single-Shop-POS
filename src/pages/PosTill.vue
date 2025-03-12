@@ -21,14 +21,14 @@
       ref="printableDiv"
     >
       <!-- Cart Summary -->
-      <q-card class="q-mt-md" style="flex-grow: 1" bordered>
+      <q-card square class="q-mt-md" style="flex-grow: 1" bordered>
         <q-card-section style="height: 350px; overflow-y: auto">
           <div class="text-h6">Cart</div>
 
           <!-- Table Header -->
           <div class="cart-header">
             <div>Product Name</div>
-            <div>Price (£)</div>
+            <div>Price ({{ this.$currency }})</div>
             <div>Qty</div>
             <div>Condition</div>
             <div>Type</div>
@@ -56,7 +56,7 @@
         <q-separator />
 
         <q-card-section>
-          <div><strong>Total:</strong> £{{ totalAmount }}</div>
+          <div><strong>Total:</strong> {{ this.$currency }}{{ totalAmount }}</div>
         </q-card-section>
       </q-card>
     </div>
@@ -84,20 +84,30 @@
       </div>
     </div>
     <div class="col-12 q-pt-md">
-      <div class="q-gutter-sm">
-        <q-btn color="primary" @click="print()" tabindex="-1"> Print </q-btn>
+      <div class="q-gutter-md">
+        <q-btn color="primary" @click="OpenPayments" tabindex="-1" :disable="!this.cart.length">
+          Complete Order
+        </q-btn>
+        <q-btn color="primary" @click="() => (this.ordersModal = true)" tabindex="-1">
+          Orders List
+        </q-btn>
       </div>
     </div>
   </div>
 
+  <!-- Orders List Modal -->
+  <q-dialog v-model="ordersModal">
+    <OrdersList />
+  </q-dialog>
+
   <!-- Product Edit Modal -->
   <q-dialog
-    v-model="editDialog"
+    v-model="editProductModal"
     persistent
     @keydown.enter="saveProductEdit"
     @keydown.esc="closeEditDialog"
   >
-    <q-card class="full-width">
+    <q-card square class="full-width">
       <q-card-section>
         <div class="text-h6">Edit Product</div>
         <div class="q-pt-xs">
@@ -118,28 +128,49 @@
       </q-card-actions>
     </q-card>
   </q-dialog>
+
+  <PaymentData
+    v-if="paymentDataModal"
+    @paymentCompleted="CompleteOrder"
+    :totalBill="totalAmount"
+    @cancelPayment="
+      () => {
+        this.paymentDataModal = false
+      }
+    "
+  />
 </template>
 
 <script>
+// import { ref } from 'vue'
+import PaymentData from 'components/PaymentData.vue'
+import OrdersList from 'src/pages/OrdersList.vue'
+
 export default {
+  components: {
+    PaymentData,
+    OrdersList,
+  },
   data() {
     return {
       searchQuery: '',
       generalProducts: window.posApi.getGenProducts(),
       cart: [],
-      editDialog: false,
+      editProductModal: false,
       editProductData: {
         name: '',
         price: 0,
         qty: 1,
       },
       currentEditIndex: null,
+      paymentDataModal: false,
+      ordersModal: false,
     }
   },
   computed: {
     // Compute the total amount in the cart
     totalAmount() {
-      return this.cart.reduce((sum, item) => sum + item.price * item.qty, 0).toFixed(2)
+      return this.cart.reduce((sum, item) => sum + item.price * item.qty, 0)
     },
   },
   methods: {
@@ -172,7 +203,7 @@ export default {
     editProduct(index) {
       this.currentEditIndex = index
       this.editProductData = JSON.parse(JSON.stringify(this.cart[index]))
-      this.editDialog = true
+      this.editProductModal = true
     },
     // Close the product edit dialog without saving
     closeEditDialog() {
@@ -190,7 +221,7 @@ export default {
         })
         return
       }
-      this.editDialog = false
+      this.editProductModal = false
       this.$nextTick(() => {
         this.$refs.searchInput.focus()
       })
@@ -215,29 +246,64 @@ export default {
       updatedProduct.name = this.editProductData.name
       updatedProduct.price = this.editProductData.price
       updatedProduct.qty = parseInt(this.editProductData.qty)
-      this.editDialog = false
+      this.editProductModal = false
       this.$nextTick(() => {
         this.$refs.searchInput.focus()
       })
     },
     // Handle keyboard events for Ctrl+1, Ctrl+2, etc.
     handleKeydown(event) {
-      if (event.ctrlKey && event.key >= 1 && event.key <= this.generalProducts.length) {
+      if (this.paymentDataModal == true || this.editProductModal == true) return
+      if (
+        event.ctrlKey &&
+        event.key >= 1 &&
+        event.key <= this.generalProducts.length &&
+        event.key <= 9
+      ) {
+        event.preventDefault()
         this.addProductToCart(this.generalProducts[event.key - 1])
       }
-    },
-    print() {
-      const printContent = this.$refs.printableDiv.innerHTML
-      const printWindow = window.open('', '', 'height=600,width=800')
-      printWindow.document.write('<html><head><title>Print</title></head><body>')
-      printWindow.document.write(printContent)
-      printWindow.document.write('</body></html>')
-      printWindow.document.close()
 
-      // printWindow.onafterprint = () => {
-      //   printWindow.close()
-      // }
-      printWindow.print()
+      if ((event.ctrlKey && event.key == 'm') || (event.ctrlKey && event.key == 'M')) {
+        event.preventDefault()
+        this.OpenPayments()
+      }
+
+      if ((event.ctrlKey && event.key == 'o') || (event.ctrlKey && event.key == 'O')) {
+        event.preventDefault()
+      }
+    },
+    OpenPayments() {
+      if (!this.cart.length) {
+        this.$q.notify({
+          message: 'The Cart is empty',
+          color: 'warning',
+        })
+        return
+      }
+      this.paymentDataModal = true
+    },
+    CompleteOrder(data) {
+      console.log(data)
+      let res = window.posApi.createOrder({
+        cart: JSON.parse(JSON.stringify(this.cart)),
+        payments: JSON.parse(JSON.stringify(data)),
+      })
+      if (res) {
+        this.paymentDataModal = false
+        this.print(res)
+        return
+      }
+      this.$q.notify({
+        message: 'Cannot complete order',
+        color: 'warning',
+      })
+      return
+    },
+    print(order) {
+      this.$Print(this.$PosSlip(order), () => {
+        this.$router.go()
+      })
     },
   },
   mounted() {

@@ -56,8 +56,8 @@ async function createWindow() {
    */
   mainWindow = new BrowserWindow({
     icon: path.resolve(currentDir, 'icons/icon.png'), // tray icon
-    width: 1000,
-    height: 600,
+    width: 1200,
+    height: 800,
     useContentSize: true,
     webPreferences: {
       contextIsolation: true,
@@ -72,7 +72,7 @@ async function createWindow() {
       ),
     },
   })
-
+  mainWindow.maximize()
   if (process.env.DEV) {
     mainWindow.loadURL(process.env.APP_URL)
   } else {
@@ -81,7 +81,7 @@ async function createWindow() {
 
   if (process.env.DEBUGGING) {
     // if on DEV or Production with debug enabled
-    mainWindow.webContents.openDevTools()
+    mainWindow.webContents.openDevTools({ mode: 'detach' })
   } else {
     // we're on production; no access to devtools pls
     mainWindow.webContents.on('devtools-opened', () => {
