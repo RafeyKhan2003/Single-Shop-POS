@@ -1,4 +1,5 @@
 import { Schema, suffix } from './db'
+import { date } from 'quasar'
 
 class OrderDB {
   constructor() {
@@ -6,6 +7,7 @@ class OrderDB {
       order_id: { type: Number },
       order_time: { type: String },
       total_amount: { type: Number },
+      customer: { type: Object },
       products: { type: Array },
       payments: { type: Array },
       part_ex_products: { type: Array },
@@ -26,9 +28,10 @@ class OrderDB {
     })
     const res = this.Order.create({
       order_id: order_id,
-      order_time: new Date().toDateString(),
+      order_time: date.formatDate(new Date(), 'YYYY-MM-DD hh:mm A'),
       total_amount: total_amount,
       part_ex_products: part_ex_products,
+      customer: order.customer || {},
       payments: order.payments,
       products: order.cart,
     }).save()

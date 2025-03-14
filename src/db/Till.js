@@ -1,4 +1,5 @@
-import { Schema, suffix, date } from './db'
+import { Schema, suffix } from './db'
+import { date } from 'quasar'
 import Order from './Order'
 
 class TillDB {
@@ -13,8 +14,8 @@ class TillDB {
   }
   openTill(till) {
     const t = this.Till.create({
-      till_date: date,
-      opening_time: new Date().toDateString(),
+      till_date: date.formatDate(new Date(), 'YYYY-MM-DD'),
+      opening_time: date.formatDate(new Date(), 'YYYY-MM-DD hh:mm A'),
       closing_time: '',
       opening_amount: till.opening_amount,
       closing_amount: 0,
@@ -24,7 +25,7 @@ class TillDB {
 
   getTill() {
     let till = this.Till.findOne() || {}
-    if (till.till_date !== date) {
+    if (till.till_date !== date.formatDate(new Date(), 'YYYY-MM-DD')) {
       return {}
     }
     return till
@@ -38,7 +39,7 @@ class TillDB {
     return true
   }
   getTillTotal() {
-    const till = this.Till.findOne()
+    const till = this.Till.findOne() || { opening_amount: 0 }
     const cashSalesTotal = Order.getSalesTotal('Cash')
 
     //TODO: Subtract Cash purchase total

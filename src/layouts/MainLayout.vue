@@ -31,7 +31,10 @@
     v-if="tillDataModal"
     @tillOpened="
       (r) => {
-        if (r) this.tillDataModal = false
+        if (r) {
+          this.tillDataModal = false
+          this.$router.go()
+        }
       }
     "
   />
@@ -56,7 +59,11 @@ export default defineComponent({
       till: window.posApi.getTill(),
     }
   },
+  created() {},
   async mounted() {
+    if (!this.till.opening_time && this.$route.name != 'menu') {
+      this.$router.push({ name: 'menu' })
+    }
     if (!this.$shop.name) {
       console.log('Shop not initialized...')
       this.shopDataModal = true

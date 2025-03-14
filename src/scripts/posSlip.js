@@ -1,6 +1,6 @@
 import { currency, shop } from '../boot/init'
 
-export function PosSlip(order) {
+export function PosSlip(order, order_type = 'Sale Order') {
   let data = `
 
     <style>
@@ -69,7 +69,11 @@ export function PosSlip(order) {
         <div class="contact">Phone: ${shop.phone} | Email: ${shop.email}</div>
     </div>
     <div class="divider"></div>
-
+    <div class="cutomer">
+      <div style="font-weight:bold;text-decoration:underline;">${order_type}</div>
+    <div class="customer-name">Customer: ${(order.customer || {}).name || ''}</div>
+        <div class="contact">Phone: ${(order.customer || {}).phone || ''} | Email: ${(order.customer || {}).email || ''}</div>
+    </div>
     <table class="items-table">
         <thead>
          <tr>

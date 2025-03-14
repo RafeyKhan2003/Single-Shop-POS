@@ -38,6 +38,7 @@ import GenProduct from '../src/db/GenProduct'
 import Till from '../src/db/Till'
 import Order from '../src/db/Order'
 import Product from '../src/db/Product'
+import Purchase from '../src/db/Purchase'
 
 contextBridge.exposeInMainWorld('posApi', {
   /**
@@ -84,4 +85,14 @@ contextBridge.exposeInMainWorld('posApi', {
   removeOrder: (order) => Order.removeOrder(order),
   getSalesTotal: (payment_type) => Order.getSalesTotal(payment_type),
   getSalesTotalPayment: () => Order.getSalesTotalPayment(),
+
+  /**
+   * Purchase Related
+   */
+  createPurchase: (purchase) => Purchase.createPurchase(purchase),
+  getPurchase: (purchase_id) => Purchase.getPurchase(purchase_id),
+  getAllPurchases: () => Purchase.getAllPurchases(),
+  removePurchase: (purchase) => Purchase.removePurchase(purchase),
+  getPurchasesTotal: (payment_type) => Purchase.getPurchasesTotal(payment_type),
+  getPurchasesTotalPayment: () => Purchase.getPurchasesTotalPayment(),
 })
