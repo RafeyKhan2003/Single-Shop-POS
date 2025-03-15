@@ -2,10 +2,10 @@ import fs from 'node:fs'
 import path from 'node:path'
 import Shop from '../db/Shop'
 import { suffix } from '../db/db'
-const nodemailer = require('nodemailer')
+import nodemailer from 'nodemailer'
 
 export function SendReports(date) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const directory1 = './reports' // Replace with your first directory path
     const directory2 = './databases'
 
@@ -57,13 +57,13 @@ export function SendReports(date) {
         if (error) {
           console.error('❌ Error sending email:', error)
         } else {
-          reject(error)
+          resolve(error)
           console.log('✅ Email sent successfully:', info.response)
           resolve(info.response)
         }
       })
     } else {
-      reject('Missing email configuration')
+      resolve('Missing email configuration')
       console.log('⚠️ Missing email configuration!')
     }
   })

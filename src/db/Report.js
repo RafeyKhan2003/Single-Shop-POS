@@ -20,13 +20,20 @@ class ReportDB {
     /**
      * Check and delete previous files.
      */
+    if (!fs.existsSync(reportsPath)) {
+      fs.mkdir(reportsPath, { recursive: true }, (err) => {
+        if (err) {
+          console.error('Error creating directory:', err)
+        }
+      })
+    }
 
     // const dbFolder = path.resolve(currentDir, 'databases')
-    const deleteFiles = (folderPath) => {
+    const deleteFiles = async (folderPath) => {
       const till = Till.getTill() || { closing_time: '' }
       // Read all files in the directory
-      if (!till.closing_time) {
-        //TODO: Send email first and then proceed with delete
+      if (!till.closing_time && till.till_date != date && till.opening_date) {
+        await this.closeDay()
       }
 
       fs.readdir(folderPath, async (err, files) => {
@@ -51,6 +58,25 @@ class ReportDB {
               }
             })
           }
+        })
+      })
+
+      fs.readdir(reportsPath, async (err, files) => {
+        if (err) {
+          console.error('Error reading the directory:', err)
+          return
+        }
+
+        // Iterate over each file in the directory
+        files.forEach((file) => {
+          const filePath = path.join(folderPath, file)
+          fs.unlink(filePath, (err) => {
+            if (err) {
+              console.error('Error deleting file:', filePath, err)
+            } else {
+              console.log(`Deleted: ${filePath}`)
+            }
+          })
         })
       })
     }
@@ -307,6 +333,8 @@ class ReportDB {
 
     //Mailer to send reports
     await SendReports(daysheet.date)
+
+    Till.closeTill()
 
     return true
   }

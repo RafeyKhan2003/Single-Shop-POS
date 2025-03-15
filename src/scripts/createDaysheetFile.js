@@ -1,4 +1,4 @@
-const pdf = require('html-pdf')
+import fs from 'node:fs'
 
 function generateHtml(report) {
   return `
@@ -18,6 +18,7 @@ function generateHtml(report) {
             width:40%;
             padding: 10px;
             display: inline-block;
+            vertical-align: text-top;
           }
         h1 {
           text-align: center;
@@ -256,6 +257,22 @@ function generateHtml(report) {
           `,
             )
             .join('')}
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
         </tbody>
       </table>
 
@@ -285,6 +302,19 @@ function generateHtml(report) {
           `,
             )
             .join('')}
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+
         </tbody>
       </table>
 
@@ -320,15 +350,52 @@ function generateHtml(report) {
     </html>
   `
 }
-export function CreatePdfFile(report, filePath) {
-  return new Promise((resolve, reject) => {
-    const html = generateHtml(report)
+export async function CreatePdfFile(report, filePath) {
+  const html = generateHtml(report)
 
-    pdf.create(html).toFile(filePath, (err, res) => {
+  // pdf.create(html).toFile(filePath, (err, res) => {
+  //   if (err) {
+  //     reject(err) // Reject on error
+  //   } else {
+  //     resolve(res.filename) // Resolve with file path
+  //   }
+  // })
+  // const container = document.createElement('div')
+  // container.innerHTML = html
+  // container.style.position = 'absolute'
+  // container.style.left = '-9999px' // Hide it off-screen
+  // document.body.appendChild(container)
+
+  // try {
+  //   // Convert HTML to canvas
+  //   html2canvas(container, { scale: 2 }).then((canvas) => {
+  //     const imgData = canvas.toDataURL('image/png')
+
+  //     // Initialize jsPDF
+  //     const pdf = new jsPDF('p', 'mm', 'a4')
+  //     const imgWidth = 210 // A4 width in mm
+  //     const imgHeight = (canvas.height * imgWidth) / canvas.width
+
+  //     pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight)
+  //     pdf.save(filePath)
+  //   })
+
+  //   console.log(`PDF saved as ${filePath}`)
+  // } catch (error) {
+  //   console.error('Error generating PDF:', error)
+  // } finally {
+  //   // Remove the temporary container
+  //   document.body.removeChild(container)
+  //   resolve(true)
+  // }
+  return new Promise((resolve, reject) => {
+    fs.writeFile(filePath + '.html', html, 'utf8', (err) => {
       if (err) {
-        reject(err) // Reject on error
+        console.error('Error saving HTML file:', err)
+        reject(err)
       } else {
-        resolve(res.filename) // Resolve with file path
+        console.log(`HTML file saved at: ${filePath}`)
+        resolve(filePath)
       }
     })
   })

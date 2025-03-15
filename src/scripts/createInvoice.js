@@ -1,4 +1,4 @@
-import pdf from 'html-pdf'
+import fs from 'node:fs'
 
 export function generateSalesHTML(shop, sales) {
   return `
@@ -140,12 +140,13 @@ export function CreateSalesPdfFile(shop, sales, filePath) {
       reject('Not enough sales')
     }
     const html = generateSalesHTML(shop, sales)
-
-    pdf.create(html).toFile(filePath, (err, res) => {
+    fs.writeFile(filePath + '.html', html, 'utf8', (err) => {
       if (err) {
-        reject(err) // Reject on error
+        console.error('Error saving HTML file:', err)
+        reject(err)
       } else {
-        resolve(res.filename) // Resolve with file path
+        console.log(`HTML file saved at: ${filePath}`)
+        resolve(filePath)
       }
     })
   })

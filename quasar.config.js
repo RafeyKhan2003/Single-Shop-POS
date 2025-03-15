@@ -173,6 +173,9 @@ export default defineConfig((/* ctx */) => {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/configuring-electron
     electron: {
+      extendWebpack(cfg) {
+        cfg.externals = { 'phantomjs-prebuilt': 'commonjs phantomjs-prebuilt' }
+      },
       // extendElectronMainConf (esbuildConf) {},
       // extendElectronPreloadConf (esbuildConf) {},
 

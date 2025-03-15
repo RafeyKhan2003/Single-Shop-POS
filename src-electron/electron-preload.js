@@ -123,5 +123,9 @@ contextBridge.exposeInMainWorld('posApi', {
    * Reports Related
    */
   generateDaysheet: () => Report.generateDaysheet(),
+  // closeDay: async () => {
+  //   return await ipcRenderer.invoke('CloseDay')
+  // },
+
   closeDay: () => Report.closeDay(),
 })

@@ -1,6 +1,8 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'node:path'
 import os from 'node:os'
+
+import Report from '../src/db/Report'
 
 import { fileURLToPath } from 'node:url'
 
@@ -67,4 +69,8 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow()
   }
+})
+
+ipcMain.handle('CloseDay', () => {
+  return Report.closeDay()
 })

@@ -33,11 +33,11 @@ class TillDB {
     }
     return till
   }
-  updateTill(till) {
+  closeTill() {
     let t = this.Till.findOne() || {}
     t.update({
-      closing_time: till.closing_time || '',
-      closing_amount: till.closing_amount || 0,
+      closing_time: date.formatDate(new Date(), 'YYYY-MM-DD hh:mm A'),
+      closing_amount: this.getTillTotal(),
     }).save()
     return true
   }
