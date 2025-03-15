@@ -25,7 +25,17 @@
     </div>
   </div>
 
-  <UpdateShopData v-if="shopDataModal"></UpdateShopData>
+  <UpdateShopData
+    v-if="shopDataModal"
+    @shopUpdated="
+      (r) => {
+        if (r) {
+          this.shopDataModal = false
+          this.$router.go()
+        }
+      }
+    "
+  ></UpdateShopData>
 
   <OpenTillData
     v-if="tillDataModal"

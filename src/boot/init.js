@@ -55,9 +55,11 @@ export default boot(({ app }) => {
   app.config.globalProperties.$payment_methods = [
     'Cash',
     'Card',
+    'Bank',
     'Part Ex',
     'Voucher',
     'CycleScheme',
+    'PayPal',
   ]
   app.config.globalProperties.$voucher_methods = ['Voucher', 'CycleScheme']
 })

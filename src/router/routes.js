@@ -39,6 +39,22 @@ const routes = [
         name: 'purchases-list',
         component: () => import('src/pages/PurchaseList.vue'),
       },
+      {
+        path: 'workshops-list',
+        name: 'workshops-list',
+        component: () => import('src/pages/WorkshopsList.vue'),
+      },
+    ],
+  },
+  {
+    path: '/reports/',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: 'daysheet',
+        name: 'daysheet',
+        component: () => import('src/pages/reports/DaysheetReport.vue'),
+      },
     ],
   },
 

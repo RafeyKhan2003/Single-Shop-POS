@@ -42,6 +42,7 @@ import Till from '../src/db/Till'
 import Order from '../src/db/Order'
 import Purchase from '../src/db/Purchase'
 import Workshop from '../src/db/Workshop'
+import Report from '../src/db/Report'
 
 contextBridge.exposeInMainWorld('posApi', {
   /**
@@ -117,4 +118,10 @@ contextBridge.exposeInMainWorld('posApi', {
   removeWorkshop: (workshop) => Workshop.removeWorkshop(workshop),
   getWorkshopsTotal: (payment_type) => Workshop.getWorkshopsTotal(payment_type),
   getWorkshopsTotalPayment: () => Workshop.getWorkshopsTotalPayment(),
+
+  /**
+   * Reports Related
+   */
+  generateDaysheet: () => Report.generateDaysheet(),
+  closeDay: () => Report.closeDay(),
 })

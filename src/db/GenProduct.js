@@ -17,6 +17,8 @@ class GenProductDB {
         { name: 'Helmet', type: 'Helmet', condition: 'Used' },
         { name: 'Part', type: 'Parts', condition: 'New' },
         { name: 'Part', type: 'Parts', condition: 'Used' },
+        { name: 'Accessories', type: 'Accessories', condition: 'New' },
+        { name: 'Accessories', type: 'Accessories', condition: 'Used' },
       ].forEach((p) => this.GenProduct.create(p).save())
     }
   }

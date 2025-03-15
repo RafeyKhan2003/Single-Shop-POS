@@ -24,11 +24,15 @@
         <tbody>
           <tr v-for="o in purchases" :key="o">
             <td @click="ViewSlip(o)" class="text-bold cursor-pointer">
-              {{ o.purchase_time_formated }}
+              {{ o.time_formated }}
             </td>
             <td @click="ViewSlip(o)" class="text-bold cursor-pointer">{{ o.purchase_id }}</td>
             <td>{{ this.$currency }}{{ o.total_amount }}</td>
-            <td>{{ o.payments_string }}</td>
+            <td>
+              {{
+                o.payments.map((payment) => `${payment.payment_method}: ${payment.payment_amount}`)
+              }}
+            </td>
             <td>{{ o.products_string }}</td>
             <td
               @click="$Print($PosSlip(o, 'Purchase'))"

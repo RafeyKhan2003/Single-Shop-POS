@@ -41,6 +41,10 @@ class TillDB {
     }).save()
     return true
   }
+  getOpeningAmount() {
+    const till = this.Till.findOne() || { opening_amount: 0 }
+    return till.opening_amount
+  }
   getTillTotal() {
     const till = this.Till.findOne() || { opening_amount: 0 }
     const cashSalesTotal = Order.getSalesTotal('Cash')

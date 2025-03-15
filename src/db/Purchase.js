@@ -5,11 +5,16 @@ class PurchaseDB {
   constructor() {
     this.Purchase = Schema(`Purchases${suffix}`, {
       purchase_id: { type: Number },
+      type: { type: String, default: 'Purchase' },
       purchase_time: { type: String },
       customer: { type: Object },
       total_amount: { type: Number },
       products: { type: Array },
       payments: { type: Array },
+      time_formated: { type: String },
+      date: { type: String },
+      time: { type: String },
+      order_no: { type: String },
     })
   }
   createPurchase(purchase) {
@@ -17,13 +22,19 @@ class PurchaseDB {
     let purchase_id = this.getLatestPurchaseId()
     const total_amount = (purchase.cart || []).reduce((sum, item) => sum + item.price * item.qty, 0)
 
+    const purchase_time = date.formatDate(new Date(), 'YYYY-MM-DD hh:mm A')
     const res = this.Purchase.create({
       purchase_id: purchase_id,
-      purchase_time: date.formatDate(new Date(), 'YYYY-MM-DD hh:mm A'),
+      purchase_time: purchase_time,
       total_amount: total_amount,
       customer: purchase.customer || {},
       payments: purchase.payments,
       products: purchase.cart,
+      type: purchase.type,
+      order_no: `Purchase # ${purchase_id}`,
+      time_formated: date.formatDate(new Date(purchase_time), 'DD/MM/YYYY hh:mm A'),
+      time: date.formatDate(new Date(purchase_time), 'hh:mm A'),
+      date: date.formatDate(new Date(purchase_time), 'DD/MM/YYYY'),
     }).save()
     if (res) {
       return res
@@ -50,10 +61,6 @@ class PurchaseDB {
         payments_string: paymentsString,
         products_string: productsString,
         price: parseFloat(purchase.price),
-        purchase_time_formated: date.formatDate(
-          new Date(purchase.purchase_time),
-          'DD/MM/YYYY hh:mm A',
-        ),
       }
     })
 

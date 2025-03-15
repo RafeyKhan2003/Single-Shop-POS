@@ -2,6 +2,15 @@
   <div>
     <TopMenu />
   </div>
+  <q-select
+    square
+    dense
+    v-model="type"
+    filled
+    :options="['Purchase', 'Petty Cash', 'Refund']"
+    label="Outflow Type"
+    autofocus
+  />
 
   <div class="row" style="overflow: hidden">
     <div
@@ -57,7 +66,9 @@
       <div class="flex flex-wrap justify-between items-center w-full">
         <div class="q-mb-md q-px-xs" style="width: 50%">
           <q-btn square color="primary" style="width: 100%" @click="addProductToCart" tabindex="-1">
-            Add Product to Purchase (CTRL+1)
+            <span> Add </span> <span v-if="type === 'Purchase'"> Product to Purchase </span>
+            <span v-if="type === 'Petty Cash'"> Petty Cash </span>
+            <span v-if="type === 'Refund'"> Refund </span> (CTRL+1)
             <q-tooltip class="bg-negative" anchor="top middle" self="center middle">
               Press CTRL+1
             </q-tooltip>
@@ -112,14 +123,19 @@
   >
     <q-card square class="full-width">
       <q-card-section>
-        <div class="text-h6">Add Product to Purchase</div>
+        <div class="text-h6">
+          <span> Add </span> <span v-if="type === 'Purchase'"> Product to Purchase </span>
+          <span v-if="type === 'Petty Cash'"> Petty Cash </span>
+          <span v-if="type === 'Refund'"> Refund </span>
+        </div>
       </q-card-section>
       <q-separator />
       <q-card-section>
-        <q-input v-model="editProductData.name" label="Product Name" autofocus />
+        <q-input v-model="editProductData.name" label="Description" autofocus />
         <q-input v-model="editProductData.price" label="Price" type="number" />
         <q-input v-model="editProductData.qty" label="Quantity" type="number" />
         <q-select
+          v-if="type == 'Purchase'"
           v-model="editProductData.type"
           label="Type"
           :options="['Bike', 'Simple Product']"
@@ -128,19 +144,19 @@
           v-model="editProductData.make"
           label="Make"
           type="text"
-          v-if="editProductData.type === 'Bike'"
+          v-if="editProductData.type === 'Bike' && type == 'Purchase'"
         />
         <q-input
           v-model="editProductData.model"
           label="Model"
           type="text"
-          v-if="editProductData.type === 'Bike'"
+          v-if="editProductData.type === 'Bike' && type == 'Purchase'"
         />
         <q-input
           v-model="editProductData.color"
           label="Color"
           type="text"
-          v-if="editProductData.type === 'Bike'"
+          v-if="editProductData.type === 'Bike' && type == 'Purchase'"
         />
       </q-card-section>
       <q-card-actions>
@@ -227,6 +243,7 @@ export default {
       customer: {
         name: 'Walk-In',
       },
+      type: 'Purchase',
     }
   },
   computed: {
@@ -314,6 +331,7 @@ export default {
         cart: JSON.parse(JSON.stringify(this.cart)),
         payments: JSON.parse(JSON.stringify(data)),
         customer: JSON.parse(JSON.stringify(this.customer)),
+        type: this.type,
       })
       if (res) {
         this.paymentDataModal = false

@@ -7,25 +7,78 @@ class WorkshopDB {
       workshop_id: { type: Number },
       workshop_time: { type: String },
       customer: { type: Object },
-      total_amount: { type: Number },
+      total_amount: { type: Number, default: 0 },
       products: { type: Array },
       services: { type: Array },
       payments: { type: Array },
+      time_formated: { type: String },
+      date: { type: String },
+      time: { type: String },
+      order_no: { type: String },
+      total_vat: { type: Number, default: 0 },
+      sub_total: { type: Number },
     })
   }
   createWorkshop(workshop) {
     console.log('backend', workshop)
     let workshop_id = this.getLatestWorkshopId()
     const total_amount = (workshop.cart || []).reduce((sum, item) => sum + item.price * item.qty, 0)
+    let total_vat = 0
 
+    const products = workshop.cart
+      .filter((p) => p.product_type === 'Product')
+      .map((p) => {
+        let price_without_vat = parseFloat(p.price)
+        let vat = 0
+
+        if (p.type != 'Helmet' && !(p.type == 'Bike' && p.condition == 'Used')) {
+          price_without_vat = parseFloat((p.price / (1 + 0.2)).toFixed(2))
+          vat = parseFloat((p.price - price_without_vat).toFixed(2))
+          total_vat += vat * p.qty
+        }
+        return {
+          ...p,
+          price_without_vat,
+          vat,
+          total: p.price * p.qty,
+        }
+      })
+
+    const services = workshop.cart
+      .filter((p) => p.product_type === 'Service')
+      .map((p) => {
+        let price_without_vat = parseFloat(p.price)
+        let vat = 0
+
+        price_without_vat = parseFloat((p.price / (1 + 0.2)).toFixed(2))
+        vat = parseFloat((p.price - price_without_vat).toFixed(2))
+        total_vat += vat * p.qty
+
+        return {
+          ...p,
+          price_without_vat,
+          vat,
+          total: p.price * p.qty,
+        }
+      })
+
+    const workshop_time = date.formatDate(new Date(), 'YYYY-MM-DD hh:mm A')
     const res = this.Workshop.create({
       workshop_id: workshop_id,
-      workshop_time: date.formatDate(new Date(), 'YYYY-MM-DD hh:mm A'),
+      workshop_time: workshop_time,
       total_amount: total_amount,
       customer: workshop.customer || {},
       payments: workshop.payments,
-      products: workshop.cart.filter((p) => p.product_type === 'Product'),
-      services: workshop.cart.filter((p) => p.product_type === 'Service'),
+      products: products,
+      services: services,
+
+      time_formated: date.formatDate(new Date(workshop_time), 'DD/MM/YYYY hh:mm A'),
+      time: date.formatDate(new Date(workshop_time), 'hh:mm A'),
+      date: date.formatDate(new Date(workshop_time), 'DD/MM/YYYY'),
+
+      order_no: `Workshop # ${workshop_id}`,
+      total_vat: total_vat,
+      sub_total: total_amount - total_vat,
     }).save()
     if (res) {
       return res
@@ -33,34 +86,9 @@ class WorkshopDB {
   }
   getWorkshop() {}
   getAllWorkshops() {
-    const orders = this.Workshop.find()
-    const transformedWorkshops = orders.map((workshop) => {
-      const paymentsString = workshop.payments
-        .map((payment) => `${payment.payment_method}: ${payment.payment_amount}`)
-        .join(' | ')
-
-      const productsString = workshop.products
-        .map((product) =>
-          Object.entries(product)
-            .map(([key, value]) => `${key}: ${value}`)
-            .join(' ,'),
-        )
-        .join(' | ')
-
-      return {
-        ...workshop,
-        payments_string: paymentsString,
-        products_string: productsString,
-        price: parseFloat(workshop.price),
-        workshop_time_formated: date.formatDate(
-          new Date(workshop.workshop_time),
-          'DD/MM/YYYY hh:mm A',
-        ),
-      }
-    })
-
-    return transformedWorkshops
+    return this.Workshop.find()
   }
+
   removeWorkshop(workshop) {
     console.log(workshop)
   }

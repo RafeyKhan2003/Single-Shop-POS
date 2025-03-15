@@ -12,7 +12,7 @@
     <div class="q-pa-sm col-12 col-sm-4">
       <q-btn square stack color="secondary" class="full-width q-py-md" :to="{ name: 'purchase' }">
         <q-icon size="5em" name="las la-cart-arrow-down" />
-        <div>Point of Purchase</div>
+        <div>Point of Purchase/Outflow</div>
       </q-btn>
     </div>
 
@@ -26,6 +26,21 @@
     <div class="q-pa-sm col-12">
       <div class="text-h6 text-bold text-red-8">Reports</div>
     </div>
+    <div class="q-pa-sm col-12 col-sm-4">
+      <q-btn
+        square
+        stack
+        color="secondary"
+        class="full-width q-py-md"
+        :to="{
+          name: 'daysheet',
+        }"
+      >
+        <q-icon size="5em" name="las la-warehouse" />
+        <div>Daysheet</div>
+      </q-btn>
+    </div>
+
     <div class="q-pa-sm col-12 col-sm-4">
       <q-btn
         square
@@ -53,6 +68,21 @@
       >
         <q-icon size="5em" name="las la-arrow-circle-down" />
         <div>Purchases List</div>
+      </q-btn>
+    </div>
+
+    <div class="q-pa-sm col-12 col-sm-4">
+      <q-btn
+        square
+        stack
+        color="secondary"
+        class="full-width q-py-md"
+        :to="{
+          name: 'workshops-list',
+        }"
+      >
+        <q-icon size="5em" name="las la-arrow-circle-down" />
+        <div>Workshop Jobs List</div>
       </q-btn>
     </div>
 
@@ -111,7 +141,7 @@
     v-if="shopDataModal"
     @shopUpdated="
       (r) => {
-        if (r) this.shopDataModal = false
+        if (r) this.$router.go()
       }
     "
   />
