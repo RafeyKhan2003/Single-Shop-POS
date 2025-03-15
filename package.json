@@ -1,8 +1,8 @@
 {
   "name": "single-shop-pos",
   "version": "0.0.1",
-  "description": "A Quasar Project",
-  "productName": "Quasar App",
+  "description": "A Single shop POS for daily activities",
+  "productName": "Single Shop POS",
   "author": "pixxtechlhr",
   "type": "module",
   "private": true,
@@ -17,7 +17,10 @@
   "dependencies": {
     "@quasar/extras": "^1.16.4",
     "db-local": "^3.1.0",
+    "exceljs": "^4.4.0",
+    "html-pdf": "^3.0.1",
     "lowdb": "^7.0.1",
+    "nodemailer": "^6.10.0",
     "quasar": "^2.16.0",
     "vue": "^3.4.18",
     "vue-router": "^4.0.0"

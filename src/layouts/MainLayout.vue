@@ -2,6 +2,7 @@
   <div class="bg-dark text-white">
     <q-toolbar>
       <q-btn
+        square
         flat
         dense
         round
@@ -24,12 +25,26 @@
     </div>
   </div>
 
-  <UpdateShopData v-if="shopDataModal" />
+  <UpdateShopData
+    v-if="shopDataModal"
+    @shopUpdated="
+      (r) => {
+        if (r) {
+          this.shopDataModal = false
+          this.$router.go()
+        }
+      }
+    "
+  ></UpdateShopData>
+
   <OpenTillData
     v-if="tillDataModal"
     @tillOpened="
       (r) => {
-        if (r) this.tillDataModal = false
+        if (r) {
+          this.tillDataModal = false
+          this.$router.go()
+        }
       }
     "
   />
@@ -51,9 +66,14 @@ export default defineComponent({
     return {
       shopDataModal: ref(false),
       tillDataModal: ref(false),
+      till: window.posApi.getTill(),
     }
   },
+  created() {},
   async mounted() {
+    if (!this.till.opening_time && this.$route.name != 'menu') {
+      this.$router.push({ name: 'menu' })
+    }
     if (!this.$shop.name) {
       console.log('Shop not initialized...')
       this.shopDataModal = true
@@ -63,7 +83,7 @@ export default defineComponent({
   },
   methods: {
     CheckOpenTill() {
-      if (!this.$till.opening_time) {
+      if (!this.till.opening_time) {
         console.log('Till not Opened...')
         this.tillDataModal = true
       }

@@ -1,8 +1,3 @@
-// import path from 'node:path'
-// import fs from 'node:fs'
-// import { fileURLToPath } from 'node:url'
-import { contextBridge } from 'electron'
-import dbLocal from 'db-local'
 // const dbLocal = require('db-local')
 
 // const currentDir = fileURLToPath(new URL('.', import.meta.url))
@@ -37,170 +32,96 @@ import dbLocal from 'db-local'
  * }
  */
 
-let date = new Date()
-date = date.toISOString().split('T')[0]
+import { contextBridge } from 'electron'
+import Shop from '../src/db/Shop'
+import GenProduct from '../src/db/GenProduct'
+import Service from '../src/db/Service'
+import Product from '../src/db/Product'
 
-const suffix = `-temp-${date}`
-
-const { Schema } = new dbLocal({ path: './databases' })
-
-const Shop = Schema(`Shop`, {
-  name: { type: String },
-  address: { type: String },
-  phone: { type: String },
-  email: { type: String },
-})
-
-const GenProduct = Schema(`GenProducts`, {
-  name: { type: String },
-  type: { type: String, default: 'Parts' },
-  condition: { type: String, default: 'New' },
-})
-
-const existingGenProducts = GenProduct.find()
-if (!existingGenProducts.length) {
-  ;[
-    { name: 'Bike', type: 'Bike', condition: 'New' },
-    { name: 'Bike', type: 'Bike', condition: 'Used' },
-    { name: 'Helmet', type: 'Helmet', condition: 'New' },
-    { name: 'Helmet', type: 'Helmet', condition: 'Used' },
-    { name: 'Part', type: 'Parts', condition: 'New' },
-    { name: 'Part', type: 'Parts', condition: 'Used' },
-  ].forEach((p) => GenProduct.create(p).save())
-}
-
-const Product = Schema(`Products`, {
-  name: { type: String },
-  username: { type: String },
-  tag: { type: String },
-})
-
-// const Sale = Schema(`Sales${suffix}`, {
-//   name: { type: String },
-//   username: { type: String },
-//   tag: { type: String },
-// })
-
-const Till = Schema(`Till${suffix}`, {
-  till_date: { type: String },
-  opening_time: { type: Date },
-  closing_time: { type: Date },
-  opening_amount: { type: Number },
-  closing_amount: { type: Number },
-})
+import Till from '../src/db/Till'
+import Order from '../src/db/Order'
+import Purchase from '../src/db/Purchase'
+import Workshop from '../src/db/Workshop'
+import Report from '../src/db/Report'
 
 contextBridge.exposeInMainWorld('posApi', {
   /**
    * Shop Related
    */
-
-  updateShop: (shop) => {
-    console.log(shop)
-    let s = Shop.findOne() || {}
-    if (s.name) {
-      s.update({
-        name: shop.name,
-        address: shop.address,
-        phone: shop.phone,
-        email: shop.email,
-      }).save()
-      return true
-    }
-    let sh = Shop.create({
-      name: shop.name,
-      address: shop.address,
-      phone: shop.phone,
-      email: shop.email,
-    }).save()
-
-    if (sh) {
-      return true
-    }
-  },
-  getShop: () => {
-    return Shop.findOne() || {}
-  },
+  updateShop: (shop) => Shop.updateShop(shop),
+  getShop: () => Shop.getShop(),
 
   /**
    * Till Related
    */
 
-  openTill: (till) => {
-    const t = Till.create({
-      till_date: date,
-      opening_time: new Date().toDateString(),
-      closing_time: '',
-      opening_amount: till.opening_amount,
-      closing_amount: 0,
-    }).save()
-    if (t) return true
-  },
-  getTill: () => {
-    let till = Till.findOne() || {}
-    if (till.till_date !== date) {
-      return {}
-    }
-    return till
-  },
-  updateTill: (till) => {
-    let t = Till.findOne() || {}
-    t.update({
-      closing_time: till.closing_time || '',
-      closing_amount: till.closing_amount || 0,
-    }).save()
-    return true
-  },
+  openTill: (till) => Till.openTill(till),
+  getTill: () => Till.getTill(),
+  updateTill: (till) => Till.updateTill(till),
+  getTillTotal: () => Till.getTillTotal(), //check
 
   /**
    * General Products Related
    */
-  createGenProduct: async (product) => {
-    const pr = GenProduct.create({
-      name: product.name,
-      type: product.type,
-      condition: product.condition,
-    }).save()
-    if (pr) return true
-  },
-  updateGenProduct: (pr) => {
-    const product = GenProduct.findOne({ _id: pr._id })
-    if (!product) return false
-    product
-      .update({
-        name: pr.name,
-        type: pr.type,
-        condition: pr.condition,
-      })
-      .save()
+  createGenProduct: (pr) => GenProduct.createGenProduct(pr),
+  updateGenProduct: (pr) => GenProduct.updateGenProduct(pr),
+  getGenProducts: () => GenProduct.getGenProducts(),
+  removeGenProduct: (pr) => GenProduct.removeGenProduct(pr),
+  findGenProduct: () => GenProduct.removeGenProduct(),
 
-    return true
-  },
-  getGenProducts: () => {
-    return GenProduct.find()
-  },
-  removeGenProduct: (pr) => {
-    return GenProduct.remove({ _id: pr._id })
-  },
-  findGenProduct: () => {},
+  /**
+   * Services Related
+   */
+  createService: (sr) => Service.createService(sr),
+  updateService: (sr) => Service.updateService(sr),
+  getServices: () => Service.getServices(),
+  removeService: (sr) => Service.removeService(sr),
+  findService: () => Service.removeService(),
 
-  createProduct: async () => {
-    const user = Product.create({
-      // _id: 1,
-      username: 'Lennart',
-      tag: 'Lennart#123',
-      bag: { weapons: ['bow', 'katana'] },
-    }).save()
+  /**
+   *
+   * @param {Products} pr
+   * @returns
+   */
+  createProduct: (pr) => Product.createProduct(pr),
+  updateProduct: (pr) => Product.updateProduct(pr),
+  getProducts: () => Product.getProducts(),
+  removeProduct: (pr) => Product.removeProduct(pr),
+  findProduct: () => Product.removeProduct(),
 
-    user.save()
-    console.log(user)
+  /**
+   * Orders Related
+   */
+  createOrder: (order) => Order.createOrder(order),
+  getOrder: (order_id) => Order.getOrder(order_id),
+  getAllOrders: () => Order.getAllOrders(),
+  removeOrder: (order) => Order.removeOrder(order),
+  getSalesTotal: (payment_type) => Order.getSalesTotal(payment_type),
+  getSalesTotalPayment: () => Order.getSalesTotalPayment(),
 
-    console.log('wokirg')
-  },
-  updateProduct: () => {},
-  removeProduct: () => {},
-  findProduct: () => {},
-  // createProduct: () => {},
-  // createProduct: () => {},
-  // createProduct: () => {},
-  // createProduct: () => {},
+  /**
+   * Purchase Related
+   */
+  createPurchase: (purchase) => Purchase.createPurchase(purchase),
+  getPurchase: (purchase_id) => Purchase.getPurchase(purchase_id),
+  getAllPurchases: () => Purchase.getAllPurchases(),
+  removePurchase: (purchase) => Purchase.removePurchase(purchase),
+  getPurchasesTotal: (payment_type) => Purchase.getPurchasesTotal(payment_type),
+  getPurchasesTotalPayment: () => Purchase.getPurchasesTotalPayment(),
+
+  /**
+   * Workshop Related
+   */
+  createWorkshop: (workshop) => Workshop.createWorkshop(workshop),
+  getWorkshop: (workshop_id) => Workshop.getWorkshop(workshop_id),
+  getAllWorkshops: () => Workshop.getAllWorkshops(),
+  removeWorkshop: (workshop) => Workshop.removeWorkshop(workshop),
+  getWorkshopsTotal: (payment_type) => Workshop.getWorkshopsTotal(payment_type),
+  getWorkshopsTotalPayment: () => Workshop.getWorkshopsTotalPayment(),
+
+  /**
+   * Reports Related
+   */
+  generateDaysheet: () => Report.generateDaysheet(),
+  closeDay: () => Report.closeDay(),
 })

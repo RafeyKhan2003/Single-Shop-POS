@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="modal" persistent>
-    <q-card class="full-width">
+    <q-card square class="full-width">
       <q-form @submit.prevent="OpenTill">
         <q-card-section>
           <div class="text-center q-ml-sm text-h5 text-red-8">Open Till - {{ date }}</div>
@@ -14,14 +14,14 @@
               dense
               required
               :rules="[(value) => !isNaN(value) || 'Please enter a valid amount']"
-              prefix="£"
+              :prefix="this.$currency"
               type="text"
             />
           </div>
         </q-card-section>
         <q-separator />
         <q-card-actions align="right">
-          <q-btn label="Save" icon="las la-save" color="green-8" type="submit" />
+          <q-btn square label="Save" icon="las la-save" color="green-8" type="submit" />
         </q-card-actions>
       </q-form>
     </q-card>
@@ -44,18 +44,11 @@ export default defineComponent({
       }),
     }
   },
-  created() {
-    if (this.$till.name) {
-      this.till = JSON.parse(JSON.stringify(this.$till))
-    }
-  },
+  created() {},
   methods: {
     async OpenTill() {
       let res = window.posApi.openTill({
-        name: this.till.name,
-        address: this.till.address,
-        phone: this.till.phone,
-        email: this.till.email,
+        opening_amount: parseFloat(this.till.opening_amount),
       })
 
       console.log(res)

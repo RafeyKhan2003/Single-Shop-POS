@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="modal" persistent>
-    <q-card class="full-width">
+    <q-card square class="full-width">
       <q-form @submit.prevent="UpdateShop">
         <q-card-section>
           <div class="text-center q-ml-sm text-h5 text-red-8">Update Shop Data</div>
@@ -11,11 +11,22 @@
             <q-input filled v-model="shop.address" label="Address" dense required />
             <q-input filled v-model="shop.phone" label="Phone" dense required />
             <q-input filled v-model="shop.email" label="Email" dense required />
+            <!-- <q-input filled v-model="shop.mail.username" label="SMTP Sending Email" dense />
+            <q-input filled v-model="shop.mail.password" label="SMTP Password" dense />
+            <q-input filled v-model="shop.mail.server" label="SMTP Server" dense />
+            <q-input filled v-model="shop.mail.port" label="SMTP Port" dense /> -->
+            <q-input
+              filled
+              v-model="shop.mail.company_emails"
+              label="Reports Receiving Emails"
+              hint="Comma separated"
+              dense
+            />
           </div>
         </q-card-section>
         <q-separator />
         <q-card-actions align="right">
-          <q-btn label="Save" icon="las la-save" color="green-8" type="submit" />
+          <q-btn square label="Save" icon="las la-save" color="green-8" type="submit" />
         </q-card-actions>
       </q-form>
     </q-card>
@@ -36,6 +47,7 @@ export default defineComponent({
         address: 'asdfs',
         phone: 'asdfs',
         email: 'asdfs',
+        mail: {},
       }),
     }
   },
@@ -46,12 +58,7 @@ export default defineComponent({
   },
   methods: {
     async UpdateShop() {
-      let res = window.posApi.updateShop({
-        name: this.shop.name,
-        address: this.shop.address,
-        phone: this.shop.phone,
-        email: this.shop.email,
-      })
+      let res = window.posApi.updateShop(JSON.parse(JSON.stringify(this.shop)))
 
       console.log(res)
       if (res) {
