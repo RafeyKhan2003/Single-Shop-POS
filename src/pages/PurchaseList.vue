@@ -10,7 +10,7 @@
     </q-card-section>
 
     <q-card-section class="no-padding">
-      <q-markup-table dense flat bpurchaseed square separator="cell">
+      <q-markup-table dense flat bpurchaseed square separator="cell" wrap-cells>
         <thead>
           <tr class="text-bold bg-secondary text-white">
             <th class="text-left">Purchase Time</th>
@@ -23,7 +23,9 @@
         </thead>
         <tbody>
           <tr v-for="o in purchases" :key="o">
-            <td @click="ViewSlip(o)" class="text-bold cursor-pointer">{{ o.purchase_time }}</td>
+            <td @click="ViewSlip(o)" class="text-bold cursor-pointer">
+              {{ o.purchase_time_formated }}
+            </td>
             <td @click="ViewSlip(o)" class="text-bold cursor-pointer">{{ o.purchase_id }}</td>
             <td>{{ this.$currency }}{{ o.total_amount }}</td>
             <td>{{ o.payments_string }}</td>
@@ -43,7 +45,7 @@
     <!-- <q-card>
       <q-card-section> Testing </q-card-section>
     </q-card> -->
-    <OrderSlip :purchase="currentOrder" />
+    <OrderSlip :order="currentPurchase" order_type="Purchase" />
   </q-dialog>
 </template>
 
@@ -52,7 +54,7 @@ import { defineComponent } from 'vue'
 import OrderSlip from 'components/OrderSlip.vue'
 
 export default defineComponent({
-  name: 'OrdersList',
+  name: 'PurchasesList',
   components: {
     OrderSlip,
   },
@@ -61,16 +63,17 @@ export default defineComponent({
       purchases: [],
       payments: [],
       modal: false,
-      currentOrder: {},
+      currentPurchase: {},
     }
   },
   created() {
-    this.purchases = window.posApi.getAllOrders()
-    this.payments = window.posApi.getSalesTotalPayment()
+    this.purchases = window.posApi.getAllPurchases()
+    this.payments = window.posApi.getPurchasesTotalPayment()
   },
   methods: {
     ViewSlip(purchase) {
-      this.currentOrder = purchase
+      console.log(purchase)
+      this.currentPurchase = purchase
       this.modal = true
     },
   },

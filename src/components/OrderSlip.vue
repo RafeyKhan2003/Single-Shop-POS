@@ -16,13 +16,19 @@ export default defineComponent({
       type: Object,
       required: true,
     },
+    order_type: {
+      type: String,
+      // default: 'Sale Order',
+    },
   },
   data() {
+    console.log(this.order)
     return {}
   },
   computed: {
     orderHtml() {
-      return this.$PosSlip(this.order)
+      console.log(this.order_type)
+      return this.$PosSlip(this.order, this.order_type)
     },
   },
 })

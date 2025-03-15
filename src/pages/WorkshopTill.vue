@@ -34,7 +34,7 @@
       <q-card square class="q-mt-md no-shadow" style="flex-grow: 1" bordered>
         <q-card-section>
           <div class="flex justify-between items-center">
-            <span class="text-h6">Cart</span>
+            <span class="text-h6">Workshop Cart</span>
             <span @click="() => (this.customerModal = true)" class="q-ml-auto cursor-pointer"
               >Customer: {{ customer.name }}</span
             >
@@ -50,13 +50,14 @@
 
           <q-separator />
         </q-card-section>
-        <q-card-section style="height: 230px; overflow-y: auto">
+        <q-card-section style="height: 180px; overflow-y: auto; padding-top: 0px">
           <!-- Table Rows -->
           <div
             class="cart-row"
             v-for="(item, index) in cart"
             :key="index"
             @click="editProduct(index)"
+            :class="item.product_type == 'Service' ? 'bg-green-1' : ''"
           >
             <div>
               <strong>{{ item.name }}</strong>
@@ -80,34 +81,64 @@
             Customer
           </q-btn>
           <q-btn square color="primary" @click="() => (this.ordersModal = true)" tabindex="-1">
-            Orders List
+            Workshops List
           </q-btn>
         </div>
       </div>
     </div>
 
     <div class="col-7 q-pl-sm q-pt-md">
-      <div class="flex flex-wrap justify-between items-center w-full">
-        <div
-          v-for="(product, index) in generalProducts"
-          :key="index"
-          class="q-mb-md q-px-xs"
-          style="width: 50%"
-        >
-          <q-btn
-            square
-            color="primary"
-            style="width: 100%"
-            @click="addProductToCart(product)"
-            tabindex="-1"
-          >
-            {{ product.name }} ({{ product.condition }})
-            <q-tooltip class="bg-negative" anchor="top middle" self="center middle"
-              >Press CTRL+{{ index + 1 }}
-            </q-tooltip>
-          </q-btn>
+      <div class="row">
+        <div class="col-6 q-pr-xs" style="height: 270px; overflow-y: auto">
+          <div class="flex flex-wrap justify-between items-center w-full">
+            <div
+              v-for="(product, index) in generalProducts"
+              :key="index"
+              class="q-mb-md q-px-xs full-height"
+              style="width: 50%"
+            >
+              <q-btn
+                square
+                color="primary"
+                style="width: 100%"
+                @click="addProductToCart(product)"
+                tabindex="-1"
+                class="full-height"
+              >
+                {{ product.name }} ({{ product.condition }})
+                <q-tooltip class="bg-negative" anchor="top middle" self="center middle"
+                  >Press CTRL+{{ index + 1 }}
+                </q-tooltip>
+              </q-btn>
+            </div>
+          </div>
+        </div>
+        <div class="col-6" style="height: 270px; overflow-y: auto">
+          <div class="flex flex-wrap justify-between items-center w-full">
+            <div
+              v-for="(service, index) in services"
+              :key="index"
+              class="q-mb-md q-px-xs full-height"
+              style="width: 50%"
+            >
+              <q-btn
+                square
+                color="primary"
+                style="width: 100%"
+                @click="addProductToCart(service, 'Service')"
+                tabindex="-1"
+                class="full-height"
+              >
+                {{ service.name }}
+                <q-tooltip class="bg-negative" anchor="top middle" self="center middle">
+                  Press F{{ index + 1 }}
+                </q-tooltip>
+              </q-btn>
+            </div>
+          </div>
         </div>
       </div>
+
       <div class="q-pl-sm q-pt-md till-counter">
         <div class="q-pa-lg text-center bg-blue-8">
           <div class="text-h3 q-mb-sm">{{ this.$currency }}{{ totalAmount }}</div>
@@ -125,14 +156,14 @@
             tabindex="-1"
             :disable="!this.cart.length"
           >
-            Complete Order
+            Complete Workshop Job
           </q-btn>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Orders List Modal -->
+  <!-- Workshops List Modal -->
   <q-dialog
     v-model="ordersModal"
     @hide="
@@ -143,7 +174,7 @@
       }
     "
   >
-    <OrdersList />
+    <WorkshopsList />
   </q-dialog>
 
   <!-- Product Edit Modal -->
@@ -158,7 +189,8 @@
         <div class="text-h6">Edit Product</div>
         <div class="q-pt-xs">
           <small class="text-bold">
-            Condition: {{ editProductData.condition }}, Type: {{ editProductData.type }}
+            Condition: {{ editProductData.condition }}, Type:
+            {{ editProductData.type || editProductData.product_type }}
           </small>
         </div>
       </q-card-section>
@@ -206,7 +238,7 @@
 
   <PaymentData
     v-if="paymentDataModal"
-    @paymentCompleted="CompleteOrder"
+    @paymentCompleted="CompleteWorkshop"
     :totalBill="totalAmount"
     @cancelPayment="
       () => {
@@ -219,14 +251,14 @@
 <script>
 // import { ref } from 'vue'
 import PaymentData from 'components/PaymentData.vue'
-import OrdersList from 'src/pages/OrdersList.vue'
+import WorkshopsList from 'src/pages/WorkshopsList.vue'
 import SearchProduct from 'components/SearchProduct.vue'
 import TopMenu from 'components/TopMenu.vue'
 
 export default {
   components: {
     PaymentData,
-    OrdersList,
+    WorkshopsList,
     SearchProduct,
     TopMenu,
   },
@@ -234,6 +266,7 @@ export default {
     return {
       searchQuery: '',
       generalProducts: window.posApi.getGenProducts(),
+      services: window.posApi.getServices(),
       currentTill: window.posApi.getTillTotal(),
       till: window.posApi.getTill(),
       cart: [],
@@ -264,7 +297,7 @@ export default {
       // Filtering happens automatically through `filteredProducts` computed property
     },
     // Add product to cart
-    addProductToCart(product) {
+    addProductToCart(product, product_type = 'Product') {
       let index = this.cart.findIndex(
         (p) =>
           p.name === product.name && p.condition === product.condition && p.type === product.type,
@@ -273,7 +306,7 @@ export default {
       if (index !== -1) {
         this.cart[index].qty++
       } else {
-        this.cart.push({ ...product, qty: 1 })
+        this.cart.push({ ...product, qty: 1, product_type })
         index = this.cart.length - 1
       }
 
@@ -327,6 +360,7 @@ export default {
     // Handle keyboard events for Ctrl+1, Ctrl+2, etc.
     handleKeydown(event) {
       if (this.paymentDataModal == true || this.editProductModal == true) return
+      // console.log(event)
       if (
         event.ctrlKey &&
         event.key >= 1 &&
@@ -345,6 +379,10 @@ export default {
       if ((event.ctrlKey && event.key == 'o') || (event.ctrlKey && event.key == 'O')) {
         event.preventDefault()
       }
+      if (event.key.includes('F') && event.key.length > 1) {
+        event.preventDefault()
+        this.addProductToCart(this.services[event.key.match(/\d+/g)?.join('') - 1], 'Service')
+      }
     },
     OpenPayments() {
       if (!this.cart.length) {
@@ -356,9 +394,9 @@ export default {
       }
       this.paymentDataModal = true
     },
-    CompleteOrder(data) {
+    CompleteWorkshop(data) {
       console.log(data)
-      let res = window.posApi.createOrder({
+      let res = window.posApi.createWorkshop({
         cart: JSON.parse(JSON.stringify(this.cart)),
         payments: JSON.parse(JSON.stringify(data)),
         customer: JSON.parse(JSON.stringify(this.customer)),

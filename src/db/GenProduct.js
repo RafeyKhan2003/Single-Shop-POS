@@ -43,7 +43,7 @@ class GenProductDB {
     return true
   }
   getGenProducts() {
-    return this.GenProduct.find()
+    return this.GenProduct.find().sort((a, b) => a.name.localeCompare(b.name))
   }
   removeGenProduct(pr) {
     return this.GenProduct.remove({ _id: pr._id })

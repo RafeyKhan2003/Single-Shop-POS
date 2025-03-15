@@ -36,10 +36,24 @@ class PurchaseDB {
       const paymentsString = purchase.payments
         .map((payment) => `${payment.payment_method}: ${payment.payment_amount}`)
         .join(' | ')
+
+      const productsString = purchase.products
+        .map((product) =>
+          Object.entries(product)
+            .map(([key, value]) => `${key}: ${value}`)
+            .join(' ,'),
+        )
+        .join(' | ')
+
       return {
         ...purchase,
         payments_string: paymentsString,
+        products_string: productsString,
         price: parseFloat(purchase.price),
+        purchase_time_formated: date.formatDate(
+          new Date(purchase.purchase_time),
+          'DD/MM/YYYY hh:mm A',
+        ),
       }
     })
 

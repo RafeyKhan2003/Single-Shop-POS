@@ -1,11 +1,12 @@
 import { currency, shop } from '../boot/init'
 
 export function PosSlip(order, order_type = 'Sale Order') {
+  const order_time =
+    order.order_time_formated || order.purchase_time_formated || order.workshop_time_formated || ''
+
   let data = `
 
     <style>
-
-
         .header {
             text-align: center;
             margin-bottom: 10px;
@@ -17,7 +18,8 @@ export function PosSlip(order, order_type = 'Sale Order') {
         }
 
         .address,
-        .contact {
+        .contact,
+        .date-time {
             font-size: 10px;
             margin: 2px 0;
         }
@@ -49,6 +51,19 @@ export function PosSlip(order, order_type = 'Sale Order') {
             margin-top: 10px;
         }
 
+        .total {
+            font-size: 12px;
+            font-weight: bold;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .payments {
+            font-size: 10px;
+            margin-top: 5px;
+            text-align: right;
+        }
+
         @media print {
             body {
                 width: 80mm;
@@ -67,62 +82,96 @@ export function PosSlip(order, order_type = 'Sale Order') {
         <div class="shop-name">${shop.name}</div>
         <div class="address">${shop.address}</div>
         <div class="contact">Phone: ${shop.phone} | Email: ${shop.email}</div>
+        <div class="date-time"><strong>Date:</strong> ${order_time}</div>
     </div>
+
     <div class="divider"></div>
-    <div class="cutomer">
-      <div style="font-weight:bold;text-decoration:underline;">${order_type}</div>
-    <div class="customer-name">Customer: ${(order.customer || {}).name || ''}</div>
-        <div class="contact">Phone: ${(order.customer || {}).phone || ''} | Email: ${(order.customer || {}).email || ''}</div>
+
+    <div class="customer">
+      <div style="font-weight:bold;text-decoration:underline;">${order_type}: ${order.order_id || order.purchase_id || order.workshop_id || ''}</div>
+      <div class="customer-name">Customer: ${(order.customer || {}).name || 'Walk-in'}</div>
+      <div class="contact">Phone: ${(order.customer || {}).phone || ''} | Email: ${(order.customer || {}).email || ''}</div>
     </div>
+            `
+
+  const products = order.products || []
+  if (products.length) {
+    data += `
     <table class="items-table">
         <thead>
-         <tr>
-                <th>Item</th>
+            <tr>
+                <th>Product</th>
                 <th>Qty</th>
-                <th>Unit Price</th>
+                <th>Unit</th>
                 <th>Total</th>
             </tr>
-             </thead>
+        </thead>
         <tbody>
             `
-  ;(order.products || []).forEach((p) => {
-    console.log(p)
+    ;(order.products || []).forEach((p) => {
+      data += `
+                      <tr>
+                          <td>${p.name} ${p.condition ? `(${p.condition})` : ''}</td>
+                          <td>${p.qty}</td>
+                          <td>${currency}${parseFloat(p.price).toFixed(2)}</td>
+                          <td>${currency}${(parseFloat(p.price) * p.qty).toFixed(2)}</td>
+                      </tr>
+                    `
+    })
+
     data += `
-           <tr>
-                <td>${p.name} - ${p.condition}</td>
+                  </tbody>
+              </table>`
+  }
+
+  const services = order.services || []
+  if (services.length) {
+    data += `<table class="items-table">
+        <thead>
+            <tr>
+                <th>Service</th>
+                <th>Qty</th>
+                <th>Unit</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            `
+    ;(order.services || []).forEach((p) => {
+      data += `
+            <tr>
+                <td>${p.name}</td>
                 <td>${p.qty}</td>
                 <td>${currency}${parseFloat(p.price).toFixed(2)}</td>
                 <td>${currency}${(parseFloat(p.price) * p.qty).toFixed(2)}</td>
             </tr>
           `
-  })
+    })
 
-  data += `
-        </tbody>
-    </table>
+    data += `
+              </tbody>
+          </table>`
+  }
 
-    <div class="divider"></div>
-    <div class="total">
-        <strong>Total: ${currency}${order.total_amount}</strong>
-    </div>
+  data += `<div class="divider"></div>
 
-    <div class="total" style="margin-top:5px;">
-    <small>
-        `
+    <div class="total">Total: ${currency}${order.total_amount.toFixed(2)}</div>
+
+    <div class="payments">
+    `
   ;(order.payments || []).forEach((p) => {
     data += `
-           <strong>${p.payment_method}: ${currency}${p.payment_amount} ${p.voucher_number ? `(${p.voucher_number})` : ''}</strong><br />
-          `
+        <div><strong>${p.payment_method}:</strong> ${currency}${p.payment_amount.toFixed(2)} ${p.voucher_number ? `(<strong>Voucher:</strong> ${p.voucher_number})` : ''}</div>
+    `
   })
 
   data += `
-  </small></div>
+    </div>
 
     <div class="footer">
         <p>This is a computer-generated slip. No signature is required.</p>
         <p>Thank you for shopping with us!</p>
     </div>
-
   `
 
   return data

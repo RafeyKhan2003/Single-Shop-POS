@@ -50,6 +50,7 @@ class OrderDB {
         ...order,
         payments_string: paymentsString,
         price: parseFloat(order.price),
+        order_time_formated: date.formatDate(new Date(order.order_time), 'DD/MM/YYYY hh:mm A'),
       }
     })
 

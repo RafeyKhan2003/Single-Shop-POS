@@ -5,7 +5,7 @@
 
   <div class="row" style="overflow: hidden">
     <div
-      class="col-6 q-pr-sm"
+      class="col-5 q-pr-sm"
       style="height: 100%; display: flex; flex-direction: column"
       ref="printableDiv"
     >
@@ -53,7 +53,7 @@
       </q-card>
     </div>
 
-    <div class="col-6 q-pl-sm q-pt-md">
+    <div class="col-7 q-pl-sm q-pt-md">
       <div class="flex flex-wrap justify-between items-center w-full">
         <div class="q-mb-md q-px-xs" style="width: 50%">
           <q-btn square color="primary" style="width: 100%" @click="addProductToCart" tabindex="-1">
@@ -75,12 +75,12 @@
         </q-btn>
       </div>
     </div>
-    <div class="col-6 q-pl-sm q-pt-md">
+    <div class="q-pl-sm q-pt-md till-counter">
       <div class="q-pa-lg text-center bg-blue-8">
         <div class="text-h3 q-mb-sm">{{ this.$currency }}{{ totalAmount }}</div>
         <div>
-          Opening: {{ this.$currency }}{{ till.opening_amount }} - Current Till: {{ this.$currency
-          }}{{ currentTill }}
+          <strong>Current Till: {{ this.$currency }}{{ currentTill }}</strong> - Opening:
+          {{ this.$currency }}{{ till.opening_amount }}
         </div>
       </div>
       <div>
@@ -354,19 +354,20 @@ body {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
   gap: 10px;
-  padding: 8px 0;
+  padding: 3px 0;
   text-align: left;
 }
 
 .cart-header {
   font-weight: bold;
   border-bottom: 2px solid #ccc;
-  padding-bottom: 5px;
+  padding-bottom: 3px;
 }
 
 .cart-row {
   border-bottom: 1px solid #eee;
   cursor: pointer;
+  font-size: 0.7rem;
 }
 
 .cart-row:hover {

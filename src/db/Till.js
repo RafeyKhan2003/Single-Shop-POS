@@ -1,6 +1,8 @@
 import { Schema, suffix } from './db'
 import { date } from 'quasar'
 import Order from './Order'
+import Purchase from './Purchase'
+import Workshop from './Workshop'
 
 class TillDB {
   constructor() {
@@ -12,6 +14,7 @@ class TillDB {
       closing_amount: { type: Number },
     })
   }
+
   openTill(till) {
     const t = this.Till.create({
       till_date: date.formatDate(new Date(), 'YYYY-MM-DD'),
@@ -41,11 +44,10 @@ class TillDB {
   getTillTotal() {
     const till = this.Till.findOne() || { opening_amount: 0 }
     const cashSalesTotal = Order.getSalesTotal('Cash')
+    const cashPurchaseTotal = Purchase.getPurchasesTotal('Cash')
+    const cashWorkshopTotal = Workshop.getWorkshopsTotal('Cash')
 
-    //TODO: Subtract Cash purchase total
-    const cashPurchaseTotal = 0
-
-    return till.opening_amount + cashSalesTotal - cashPurchaseTotal
+    return till.opening_amount + cashSalesTotal + cashWorkshopTotal - cashPurchaseTotal
   }
 }
 

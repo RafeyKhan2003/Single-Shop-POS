@@ -35,10 +35,13 @@
 import { contextBridge } from 'electron'
 import Shop from '../src/db/Shop'
 import GenProduct from '../src/db/GenProduct'
+import Service from '../src/db/Service'
+import Product from '../src/db/Product'
+
 import Till from '../src/db/Till'
 import Order from '../src/db/Order'
-import Product from '../src/db/Product'
 import Purchase from '../src/db/Purchase'
+import Workshop from '../src/db/Workshop'
 
 contextBridge.exposeInMainWorld('posApi', {
   /**
@@ -64,6 +67,15 @@ contextBridge.exposeInMainWorld('posApi', {
   getGenProducts: () => GenProduct.getGenProducts(),
   removeGenProduct: (pr) => GenProduct.removeGenProduct(pr),
   findGenProduct: () => GenProduct.removeGenProduct(),
+
+  /**
+   * Services Related
+   */
+  createService: (sr) => Service.createService(sr),
+  updateService: (sr) => Service.updateService(sr),
+  getServices: () => Service.getServices(),
+  removeService: (sr) => Service.removeService(sr),
+  findService: () => Service.removeService(),
 
   /**
    *
@@ -95,4 +107,14 @@ contextBridge.exposeInMainWorld('posApi', {
   removePurchase: (purchase) => Purchase.removePurchase(purchase),
   getPurchasesTotal: (payment_type) => Purchase.getPurchasesTotal(payment_type),
   getPurchasesTotalPayment: () => Purchase.getPurchasesTotalPayment(),
+
+  /**
+   * Workshop Related
+   */
+  createWorkshop: (workshop) => Workshop.createWorkshop(workshop),
+  getWorkshop: (workshop_id) => Workshop.getWorkshop(workshop_id),
+  getAllWorkshops: () => Workshop.getAllWorkshops(),
+  removeWorkshop: (workshop) => Workshop.removeWorkshop(workshop),
+  getWorkshopsTotal: (payment_type) => Workshop.getWorkshopsTotal(payment_type),
+  getWorkshopsTotalPayment: () => Workshop.getWorkshopsTotalPayment(),
 })
