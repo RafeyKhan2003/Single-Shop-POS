@@ -43,11 +43,13 @@ export default defineComponent({
     return {
       modal: ref(true),
       shop: ref({
-        name: 'asdfs',
-        address: 'asdfs',
-        phone: 'asdfs',
-        email: 'asdfs',
-        mail: {},
+        name: '',
+        address: '',
+        phone: '',
+        email: '',
+        mail: {
+          company_emails: 'ftaccountants@gmail.com,pixxtechlhr@gmail.com',
+        },
       }),
     }
   },

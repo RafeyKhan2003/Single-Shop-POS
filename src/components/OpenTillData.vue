@@ -16,6 +16,7 @@
               :rules="[(value) => !isNaN(value) || 'Please enter a valid amount']"
               :prefix="this.$currency"
               type="text"
+              autofocus
             />
           </div>
         </q-card-section>
