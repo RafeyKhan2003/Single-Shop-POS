@@ -204,6 +204,9 @@ export default defineConfig((/* ctx */) => {
         // https://www.electron.build/configuration/configuration
 
         appId: 'single-shop-pos',
+        win: {
+          target: 'nsis',
+        },
       },
     },
 
