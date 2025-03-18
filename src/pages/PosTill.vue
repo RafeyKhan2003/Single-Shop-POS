@@ -108,27 +108,18 @@
           </q-btn>
         </div>
       </div>
-      <div class="q-pl-sm q-pt-md till-counter">
-        <div class="q-pa-lg text-center bg-blue-8">
-          <div class="text-h3 q-mb-sm">{{ this.$currency }}{{ totalAmount }}</div>
-          <div>
-            <strong>Current Till: {{ this.$currency }}{{ currentTill }}</strong> - Opening:
-            {{ this.$currency }}{{ till.opening_amount }}
-          </div>
-        </div>
-        <div>
-          <q-btn
-            square
-            class="full-width"
-            color="green-8"
-            @click="OpenPayments"
-            tabindex="-1"
-            :disable="!this.cart.length"
-          >
-            Complete Order
-          </q-btn>
-        </div>
-      </div>
+      <TillCounter :totalAmount="totalAmount">
+        <q-btn
+          square
+          class="full-width"
+          color="green-8"
+          @click="OpenPayments"
+          tabindex="-1"
+          :disable="!this.cart.length"
+        >
+          Complete Order
+        </q-btn>
+      </TillCounter>
     </div>
   </div>
 
@@ -222,6 +213,7 @@ import PaymentData from 'components/PaymentData.vue'
 import OrdersList from 'src/pages/OrdersList.vue'
 import SearchProduct from 'components/SearchProduct.vue'
 import TopMenu from 'components/TopMenu.vue'
+import TillCounter from 'components/TillCounter.vue'
 
 export default {
   components: {
@@ -229,13 +221,12 @@ export default {
     OrdersList,
     SearchProduct,
     TopMenu,
+    TillCounter,
   },
   data() {
     return {
       searchQuery: '',
       generalProducts: window.posApi.getGenProducts(),
-      currentTill: window.posApi.getTillTotal(),
-      till: window.posApi.getTill(),
       cart: [],
       editProductModal: false,
       editProductData: {

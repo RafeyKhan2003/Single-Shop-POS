@@ -78,7 +78,7 @@ class OrderDB {
   }
 
   removeOrder(order) {
-    console.log(order)
+    return this.Order.remove({ _id: order._id })
   }
   getLatestOrderId() {
     let id = 1

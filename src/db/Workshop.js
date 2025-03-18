@@ -90,7 +90,7 @@ class WorkshopDB {
   }
 
   removeWorkshop(workshop) {
-    console.log(workshop)
+    return this.Workshop.remove({ _id: workshop._id })
   }
   getLatestWorkshopId() {
     let id = 1

@@ -34,11 +34,19 @@
               }}
             </td>
             <td>{{ o.products_string }}</td>
-            <td
-              @click="$Print($PosSlip(o, 'Purchase'))"
-              class="text-bold cursor-pointer text-center"
-            >
-              <q-icon name="las la-print" color="blue-8" />
+            <td class="text-bold cursor-pointer text-center">
+              <q-icon
+                @click="$Print($PosSlip(o))"
+                style="font-size: 24px"
+                name="las la-print"
+                color="blue-8"
+              />
+              <q-icon
+                @click="removePurchase(o)"
+                style="font-size: 24px"
+                name="las la-trash"
+                color="red-8"
+              />
             </td>
           </tr>
         </tbody>
@@ -79,6 +87,20 @@ export default defineComponent({
       console.log(purchase)
       this.currentPurchase = purchase
       this.modal = true
+    },
+    removePurchase(purchase) {
+      this.$q
+        .dialog({
+          title: 'Confirm',
+          message: `Are you sure you want to delete Purchase ${purchase.purchase_id}?`,
+          cancel: true,
+          persistent: true,
+        })
+        .onOk(async () => {
+          await window.posApi.removePurchase(JSON.parse(JSON.stringify(purchase)))
+          this.purchases = window.posApi.getAllPurchases()
+          this.payments = window.posApi.getPurchasesTotalPayment()
+        })
     },
   },
 })

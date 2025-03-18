@@ -67,7 +67,7 @@ class PurchaseDB {
     return transformedPurchases
   }
   removePurchase(purchase) {
-    console.log(purchase)
+    return this.Purchase.remove({ _id: purchase._id })
   }
   getLatestPurchaseId() {
     let id = 1

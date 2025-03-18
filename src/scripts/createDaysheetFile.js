@@ -388,11 +388,11 @@ export async function CreatePdfFile(report, filePath) {
   //   document.body.removeChild(container)
   //   resolve(true)
   // }
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     fs.writeFile(filePath + '.html', html, 'utf8', (err) => {
       if (err) {
         console.error('Error saving HTML file:', err)
-        reject(err)
+        resolve(err)
       } else {
         console.log(`HTML file saved at: ${filePath}`)
         resolve(filePath)

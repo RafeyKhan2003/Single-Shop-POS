@@ -32,8 +32,19 @@
                 o.payments.map((payment) => `${payment.payment_method}: ${payment.payment_amount}`)
               }}
             </td>
-            <td @click="$Print($PosSlip(o))" class="text-bold cursor-pointer text-center">
-              <q-icon name="las la-print" color="blue-8" />
+            <td class="text-bold cursor-pointer text-center">
+              <q-icon
+                @click="$Print($PosSlip(o))"
+                style="font-size: 24px"
+                name="las la-print"
+                color="blue-8"
+              />
+              <q-icon
+                @click="removeWorkshop(o)"
+                style="font-size: 24px"
+                name="las la-trash"
+                color="red-8"
+              />
             </td>
           </tr>
         </tbody>
@@ -73,6 +84,21 @@ export default defineComponent({
     ViewSlip(order) {
       this.currentWorkshop = order
       this.modal = true
+    },
+    removeWorkshop(workshop) {
+      this.$q
+        .dialog({
+          title: 'Confirm',
+          message: `Are you sure you want to delete Workshop ${workshop.workshop_id}?`,
+          cancel: true,
+          persistent: true,
+        })
+        .onOk(async () => {
+          await window.posApi.removeWorkshop(JSON.parse(JSON.stringify(workshop)))
+
+          this.workshops = window.posApi.getAllWorkshops()
+          this.payments = window.posApi.getWorkshopsTotalPayment()
+        })
     },
   },
 })

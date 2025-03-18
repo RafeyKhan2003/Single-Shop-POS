@@ -295,6 +295,15 @@ class ReportDB {
     return report
   }
 
+  getSummary() {
+    const summary = {
+      current_till: Till.getTillTotal(),
+      cash_sales: this.getTotalSales('Cash'),
+      card_sales: this.getTotalSales('Card'),
+    }
+    return summary
+  }
+
   async closeDay() {
     const shop = Shop.getShop()
     //Generating Excel an pdf Reports new
@@ -335,8 +344,27 @@ class ReportDB {
     await SendReports(daysheet.date)
 
     Till.closeTill()
+    this.deleteReportFiles()
 
     return true
+  }
+  deleteReportFiles() {
+    fs.rm(reportsPath, { recursive: true, force: true }, (err) => {
+      if (err) {
+        console.error('Error deleting folder:', err)
+        return
+      }
+
+      fs.mkdir(reportsPath, { recursive: true }, (err) => {
+        if (err) {
+          console.error('Error creating report folder:', err)
+        } else {
+          console.log('Report Folder cleared and recreated:', reportsPath)
+        }
+      })
+    })
+
+    return
   }
 }
 

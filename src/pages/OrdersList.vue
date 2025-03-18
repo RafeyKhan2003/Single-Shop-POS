@@ -28,11 +28,27 @@
             <td @click="ViewSlip(o)" class="text-bold cursor-pointer">{{ o.order_id }}</td>
             <td>{{ this.$currency }}{{ o.total_amount }}</td>
             <td>
-              {{ o.payments.map((payment) => `${payment.payment_method}: ${payment.payment_amount}`)
-              .join('<br />') }}
+              <span
+                v-html="
+                  o.payments
+                    .map((payment) => `${payment.payment_method}: ${payment.payment_amount}`)
+                    .join('<br />')
+                "
+              ></span>
             </td>
-            <td @click="$Print($PosSlip(o))" class="text-bold cursor-pointer text-center">
-              <q-icon name="las la-print" color="blue-8" />
+            <td class="text-bold cursor-pointer text-center">
+              <q-icon
+                @click="$Print($PosSlip(o))"
+                style="font-size: 24px"
+                name="las la-print"
+                color="blue-8"
+              />
+              <q-icon
+                @click="removeOrder(o)"
+                style="font-size: 24px"
+                name="las la-trash"
+                color="red-8"
+              />
             </td>
           </tr>
         </tbody>
@@ -48,7 +64,7 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import OrderSlip from 'components/OrderSlip.vue'
 
 export default defineComponent({
@@ -58,8 +74,8 @@ export default defineComponent({
   },
   data() {
     return {
-      orders: [],
-      payments: [],
+      orders: ref([]),
+      payments: ref([]),
       modal: false,
       currentOrder: {},
     }
@@ -72,6 +88,20 @@ export default defineComponent({
     ViewSlip(order) {
       this.currentOrder = order
       this.modal = true
+    },
+    removeOrder(order) {
+      this.$q
+        .dialog({
+          title: 'Confirm',
+          message: `Are you sure you want to delete Order ${order.order_id}?`,
+          cancel: true,
+          persistent: true,
+        })
+        .onOk(async () => {
+          await window.posApi.removeOrder(JSON.parse(JSON.stringify(order)))
+          this.orders = window.posApi.getAllOrders()
+          this.payments = window.posApi.getSalesTotalPayment()
+        })
     },
   },
 })

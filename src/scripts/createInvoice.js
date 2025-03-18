@@ -134,16 +134,16 @@ export function generateSalesHTML(shop, sales) {
 
 export function CreateSalesPdfFile(shop, sales, filePath) {
   console.log('CreateSalesPdfFile')
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     if (!sales.length) {
       console.warn('Not enough sales')
-      reject('Not enough sales')
+      resolve('Not enough sales')
     }
     const html = generateSalesHTML(shop, sales)
     fs.writeFile(filePath + '.html', html, 'utf8', (err) => {
       if (err) {
         console.error('Error saving HTML file:', err)
-        reject(err)
+        resolve(err)
       } else {
         console.log(`HTML file saved at: ${filePath}`)
         resolve(filePath)
