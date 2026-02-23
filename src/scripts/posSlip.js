@@ -1,7 +1,7 @@
 import { currency, shop } from '../boot/init'
 
 export function PosSlip(order, order_type = 'Sale Order') {
-  const order_time = order.time_formated || order.time_formated || order.time_formated || ''
+  const order_time = order.time_formated || order.time_formatted || order.time || ''
 
   let data = `
 

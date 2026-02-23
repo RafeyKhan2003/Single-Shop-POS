@@ -111,7 +111,7 @@ export function generateSalesHTML(shop, sales) {
                       <th>Total Amount</th>
                       <td class="bg-warning">£${parseFloat(sale.total_amount).toFixed(2)}</td>
                   </tr>
-                   ${sale.payments
+                   ${(sale.payments || [])
                      .map(
                        (item) => `
                    <tr>
@@ -138,6 +138,7 @@ export function CreateSalesPdfFile(shop, sales, filePath) {
     if (!sales.length) {
       console.warn('Not enough sales')
       resolve('Not enough sales')
+      return
     }
     const html = generateSalesHTML(shop, sales)
     fs.writeFile(filePath + '.html', html, 'utf8', (err) => {
