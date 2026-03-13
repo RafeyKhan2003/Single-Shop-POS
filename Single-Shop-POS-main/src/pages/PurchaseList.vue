@@ -1,0 +1,107 @@
+<template>
+  <q-card square class="full-width">
+    <q-card-section>
+      <div class="text-center q-ml-sm text-h5">All Purchases</div>
+      <div>
+        <span v-for="p in payments" :key="p"
+          >{{ p.payment_method }}: {{ $currency }}{{ p.total_amount }},
+        </span>
+      </div>
+    </q-card-section>
+
+    <q-card-section class="no-padding">
+      <q-markup-table dense flat bpurchaseed square separator="cell" wrap-cells>
+        <thead>
+          <tr class="text-bold bg-secondary text-white">
+            <th class="text-left">Purchase Time</th>
+            <th class="text-left">Purchase #</th>
+            <th class="text-left">Total Amount</th>
+            <th class="text-left">Payments</th>
+            <th class="text-left">Products</th>
+            <th class="text-left"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="o in purchases" :key="o">
+            <td @click="ViewSlip(o)" class="text-bold cursor-pointer">
+              {{ o.time_formated }}
+            </td>
+            <td @click="ViewSlip(o)" class="text-bold cursor-pointer">{{ o.purchase_id }}</td>
+            <td>{{ this.$currency }}{{ o.total_amount }}</td>
+            <td>
+              {{
+                o.payments.map((payment) => `${payment.payment_method}: ${payment.payment_amount}`)
+              }}
+            </td>
+            <td>{{ o.products_string }}</td>
+            <td class="text-bold cursor-pointer text-center">
+              <q-icon
+                @click="$Print($PosSlip(o))"
+                style="font-size: 24px"
+                name="las la-print"
+                color="blue-8"
+              />
+              <q-icon
+                @click="removePurchase(o)"
+                style="font-size: 24px"
+                name="las la-trash"
+                color="red-8"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </q-markup-table>
+    </q-card-section>
+  </q-card>
+  <q-dialog v-model="modal">
+    <!-- <q-card>
+      <q-card-section> Testing </q-card-section>
+    </q-card> -->
+    <OrderSlip :order="currentPurchase" order_type="Purchase" />
+  </q-dialog>
+</template>
+
+<script>
+import { defineComponent } from 'vue'
+import OrderSlip from 'components/OrderSlip.vue'
+
+export default defineComponent({
+  name: 'PurchasesList',
+  components: {
+    OrderSlip,
+  },
+  data() {
+    return {
+      purchases: [],
+      payments: [],
+      modal: false,
+      currentPurchase: {},
+    }
+  },
+  created() {
+    this.purchases = window.posApi.getAllPurchases()
+    this.payments = window.posApi.getPurchasesTotalPayment()
+  },
+  methods: {
+    ViewSlip(purchase) {
+      console.log(purchase)
+      this.currentPurchase = purchase
+      this.modal = true
+    },
+    removePurchase(purchase) {
+      this.$q
+        .dialog({
+          title: 'Confirm',
+          message: `Are you sure you want to delete Purchase ${purchase.purchase_id}?`,
+          cancel: true,
+          persistent: true,
+        })
+        .onOk(async () => {
+          await window.posApi.removePurchase(JSON.parse(JSON.stringify(purchase)))
+          this.purchases = window.posApi.getAllPurchases()
+          this.payments = window.posApi.getPurchasesTotalPayment()
+        })
+    },
+  },
+})
+</script>
